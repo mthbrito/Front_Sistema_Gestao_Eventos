@@ -1,0 +1,154 @@
+/* ============================================================
+   SGE – Login Page Styles (Zephyr Bootstrap theme)
+   ============================================================ */
+
+:root {
+  --zephyr-primary:     #3459e6;
+  --zephyr-primary-rgb: 52, 89, 230;
+  --zephyr-primary-dark:#2244c8;
+  --zephyr-border:      #dee2e6;
+  --zephyr-secondary:   #6c757d;
+  --zephyr-radius:      0.5rem;
+  --zephyr-radius-lg:   0.75rem;
+}
+
+/* Fundo */
+.sge-login-bg {
+  background: linear-gradient(135deg, #e8eeff 0%, #f0f4ff 40%, #fafbff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shapes decorativos */
+.sge-bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.18;
+  animation: sgeFloat 8s ease-in-out infinite;
+}
+.sge-bg-shape-1 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, var(--zephyr-primary), transparent 70%);
+  top: -100px; right: -80px;
+  animation-delay: 0s;
+}
+.sge-bg-shape-2 {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, #7c9ef0, transparent 70%);
+  bottom: -60px; left: -60px;
+  animation-delay: 3s;
+}
+.sge-bg-shape-3 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, #a3c4f3, transparent 70%);
+  top: 50%; left: 10%;
+  animation-delay: 5s;
+}
+
+@keyframes sgeFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-18px) scale(1.04); }
+}
+
+/* Card */
+.sge-login-card {
+  border-radius: var(--zephyr-radius-lg) !important;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  animation: sgeSlideUp 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes sgeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo */
+.sge-logo-circle {
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--zephyr-primary) 0%, #6c8ef6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(var(--zephyr-primary-rgb), 0.35);
+}
+
+/* Divisor */
+.sge-divider {
+  border-color: var(--zephyr-border);
+  opacity: 0.5;
+}
+
+/* Inputs */
+.sge-input-addon {
+  background: #f5f7ff !important;
+  border-color: var(--zephyr-border) !important;
+  color: var(--zephyr-secondary) !important;
+}
+.sge-input {
+  border-color: var(--zephyr-border) !important;
+  background: #fafbff !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sge-input:focus {
+  border-color: var(--zephyr-primary) !important;
+  box-shadow: 0 0 0 3px rgba(var(--zephyr-primary-rgb), 0.15) !important;
+  background: #fff !important;
+}
+.sge-toggle-pw {
+  background: #f5f7ff !important;
+  border-color: var(--zephyr-border) !important;
+  color: var(--zephyr-secondary) !important;
+  cursor: pointer;
+}
+.sge-toggle-pw:hover {
+  background: #eef1ff !important;
+  color: var(--zephyr-primary) !important;
+}
+
+/* Botão */
+.sge-btn-login {
+  background: linear-gradient(135deg, var(--zephyr-primary) 0%, #5b7af5 100%) !important;
+  border: none !important;
+  border-radius: var(--zephyr-radius) !important;
+  padding: 0.65rem 1.25rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 4px 14px rgba(var(--zephyr-primary-rgb), 0.35) !important;
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s !important;
+}
+.sge-btn-login:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(var(--zephyr-primary-rgb), 0.45) !important;
+  filter: brightness(1.06);
+}
+.sge-btn-login:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(var(--zephyr-primary-rgb), 0.3) !important;
+}
+.sge-btn-login:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Link */
+.sge-link {
+  color: var(--zephyr-primary) !important;
+  transition: color 0.15s;
+}
+.sge-link:hover {
+  color: var(--zephyr-primary-dark) !important;
+  text-decoration: underline !important;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .sge-login-card .card-body {
+    padding: 2rem 1.5rem !important;
+  }
+}
