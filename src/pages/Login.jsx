@@ -11,6 +11,7 @@ export default function Login({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
     setLoading(true);
     try {
       const data = await auth.login(email, senha);
