@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { auth, setToken } from '../services/apiService';
 
-export default function Login({ onLoginSuccess }) {
+export default function Login({ onLoginSuccess, onCadastro }) {
   const [email, setEmail]           = useState('');
   const [senha, setSenha]           = useState('');
   const [loading, setLoading]       = useState(false);
@@ -139,9 +139,12 @@ export default function Login({ onLoginSuccess }) {
 
                 <p className="text-center text-body-secondary small mt-4 mb-0">
                   Não tem uma conta?{' '}
-                  <a href="#" className="sge-link fw-semibold text-decoration-none">
+                  <button
+                    className="btn btn-link sge-link fw-semibold text-decoration-none p-0 small"
+                    onClick={onCadastro}
+                  >
                     Cadastre-se
-                  </a>
+                  </button>
                 </p>
               </div>
             </div>
