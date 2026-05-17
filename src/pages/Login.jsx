@@ -1,24 +1,27 @@
-import { useState } from 'react';
-import { auth, setToken } from '../services/apiService';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import "./Login.css";
 
-export default function Login({ onLoginSuccess, onCadastro }) {
-  const [email, setEmail]           = useState('');
-  const [senha, setSenha]           = useState('');
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
     setLoading(true);
     try {
-      const data = await auth.login(email, senha);
-      setToken(data.token);
-      if (onLoginSuccess) onLoginSuccess(data.token);
+      await login(email, senha);
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.message || 'E-mail ou senha inválidos. Tente novamente.');
+      setError(err.message || "E-mail ou senha inválidos. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -44,24 +47,37 @@ export default function Login({ onLoginSuccess, onCadastro }) {
                     <i className="bi bi-calendar-event fs-4" />
                   </div>
                   <h4 className="fw-bold text-body-emphasis mb-1">SGE</h4>
-                  <p className="text-body-secondary small">Sistema de Gestão de Eventos</p>
+                  <p className="text-body-secondary small">
+                    Sistema de Gestão de Eventos
+                  </p>
                 </div>
 
                 <hr className="sge-divider mb-4" />
 
                 {/* Erro */}
                 {error && (
-                  <div className="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                  <div
+                    className="alert alert-danger alert-dismissible fade show py-2 small"
+                    role="alert"
+                  >
                     <i className="bi bi-exclamation-triangle-fill me-2" />
                     {error}
-                    <button type="button" className="btn-close" onClick={() => setError('')} aria-label="Fechar" />
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => setError("")}
+                      aria-label="Fechar"
+                    />
                   </div>
                 )}
 
                 {/* Formulário */}
                 <form onSubmit={handleSubmit} noValidate>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label fw-semibold small text-body-emphasis">
+                    <label
+                      htmlFor="email"
+                      className="form-label fw-semibold small text-body-emphasis"
+                    >
                       E-mail
                     </label>
                     <div className="input-group">
@@ -84,10 +100,16 @@ export default function Login({ onLoginSuccess, onCadastro }) {
 
                   <div className="mb-4">
                     <div className="d-flex justify-content-between align-items-center mb-1">
-                      <label htmlFor="senha" className="form-label fw-semibold small text-body-emphasis mb-0">
+                      <label
+                        htmlFor="senha"
+                        className="form-label fw-semibold small text-body-emphasis mb-0"
+                      >
                         Senha
                       </label>
-                      <a href="#" className="sge-link small text-decoration-none">
+                      <a
+                        href="#"
+                        className="sge-link small text-decoration-none"
+                      >
                         Esqueceu a senha?
                       </a>
                     </div>
@@ -96,7 +118,7 @@ export default function Login({ onLoginSuccess, onCadastro }) {
                         <i className="bi bi-lock" />
                       </span>
                       <input
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         className="form-control sge-input"
                         id="senha"
                         placeholder="••••••••"
@@ -110,9 +132,13 @@ export default function Login({ onLoginSuccess, onCadastro }) {
                         className="btn sge-toggle-pw input-group-text"
                         onClick={() => setShowPassword(!showPassword)}
                         tabIndex={-1}
-                        aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                        aria-label={
+                          showPassword ? "Ocultar senha" : "Mostrar senha"
+                        }
                       >
-                        <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+                        <i
+                          className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
+                        />
                       </button>
                     </div>
                   </div>
@@ -125,7 +151,11 @@ export default function Login({ onLoginSuccess, onCadastro }) {
                     >
                       {loading ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          />
                           Entrando...
                         </>
                       ) : (
@@ -138,13 +168,17 @@ export default function Login({ onLoginSuccess, onCadastro }) {
                 </form>
 
                 <p className="text-center text-body-secondary small mt-4 mb-0">
-                  Não tem uma conta?{' '}
-                  <button
-                    className="btn btn-link sge-link fw-semibold text-decoration-none p-0 small"
-                    onClick={onCadastro}
+                  Não tem uma conta?{" "}
+                  <a
+                    href="#"
+                    className="sge-link fw-semibold text-decoration-none"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate("/cadastro");
+                    }}
                   >
                     Cadastre-se
-                  </button>
+                  </a>
                 </p>
               </div>
             </div>
