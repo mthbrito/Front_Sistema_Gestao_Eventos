@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usuarios } from "../services/apiService";
+import { validarCadastro } from "../utils/validacoes";
 
 const PERFIL_USER_ID = 2;
 
@@ -30,19 +31,9 @@ export default function Cadastro() {
     setError("");
   };
 
-  const validar = () => {
-    if (!form.nome || !form.email || !form.senha || !form.funcao)
-      return "Preencha todos os campos.";
-    if (form.nome.length < 3) return "O nome deve ter pelo menos 3 caracteres.";
-    if (form.senha.length < 4)
-      return "A senha deve ter pelo menos 4 caracteres.";
-    if (form.senha !== form.confirmarSenha) return "As senhas não coincidem.";
-    return null;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const erro = validar();
+    const erro = validarCadastro(form);
     if (erro) {
       setError(erro);
       return;

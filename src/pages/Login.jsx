@@ -18,8 +18,9 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(email, senha);
-      navigate("/dashboard");
+      const token = await login(email, senha);
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      navigate(payload.role === "ADMIN" ? "/admin/dashboard" : "/dashboard");
     } catch (err) {
       setError(err.message || "E-mail ou senha inválidos. Tente novamente.");
     } finally {
@@ -37,10 +38,8 @@ export default function Login() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
-
             <div className="card sge-login-card shadow-lg border-0">
               <div className="card-body p-4 p-md-5">
-
                 {/* Header */}
                 <div className="text-center mb-4">
                   <div className="sge-logo-circle mx-auto mb-3">

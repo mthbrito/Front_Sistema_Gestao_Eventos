@@ -1,8 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
-export function PrivateRoute() {
-  const { isAuthenticated } = useAuth();
+export function PrivateRoute({ role }) {
+  const { isAuthenticated, user } = useAuth();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  if (role && user?.role !== role) return <Navigate to="/dashboard" replace />;
+
+  return <Outlet />;
 }

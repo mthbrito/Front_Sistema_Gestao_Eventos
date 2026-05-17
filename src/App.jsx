@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
-import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
 import Cadastro from "./pages/Cadastro";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -10,9 +11,14 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+        <Route element={<PrivateRoute role="ADMIN" />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

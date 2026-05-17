@@ -58,6 +58,12 @@ export const inscricoes = {
   listar: (page = 0, size = 10) =>
     request("GET", `/api/sge/inscricoes?page=${page}&size=${size}`),
 
+  listarPorUsuario: (usuarioId, page = 0, size = 10) =>
+    request(
+      "GET",
+      `/api/sge/inscricoes/usuario/${usuarioId}?page=${page}&size=${size}`,
+    ),
+
   buscarPorId: (id) => request("GET", `/api/sge/inscricoes/${id}`),
 
   salvar: (dados) => request("POST", "/api/sge/inscricoes", dados),
