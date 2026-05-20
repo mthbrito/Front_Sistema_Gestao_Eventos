@@ -1,0 +1,13 @@
+/* ============================================================
+   SGE – Variáveis globais (Zephyr Bootstrap theme)
+   ============================================================ */
+
+:root {
+  --zephyr-primary:      #3459e6;
+  --zephyr-primary-rgb:  52, 89, 230;
+  --zephyr-primary-dark: #2244c8;
+  --zephyr-border:       #dee2e6;
+  --zephyr-secondary:    #6c757d;
+  --zephyr-radius:       0.5rem;
+  --zephyr-radius-lg:    0.75rem;
+}

@@ -10,7 +10,7 @@ import { useAuth } from "../hooks/auth/useAuth";
 import { useEventosUsuario } from "../hooks/usuario/useEventosUsuario";
 import { useInscricoesUsuario } from "../hooks/usuario/useInscricoesUsuario";
 import { useNotificacoesUsuario } from "../hooks/usuario/useNotificacoesUsuario";
-import "../styles/Login.css";
+import "../styles/Dashboard.css";
 
 const ABAS = [
   { id: "eventos", icone: "bi-calendar-event", label: "Eventos" },

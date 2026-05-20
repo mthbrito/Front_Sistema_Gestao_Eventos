@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usuarioService } from "../services/usuarioService";
 import { validarCadastro } from "../utils/validacoes";
+import "../styles/Cadastro.css";
 
 const PERFIL_USER_ID = 2;
 

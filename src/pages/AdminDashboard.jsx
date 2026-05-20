@@ -15,7 +15,7 @@ import { usePerfisAdmin } from "../hooks/admin/usePerfisAdmin";
 import { useSalasAdmin } from "../hooks/admin/useSalasAdmin";
 import { useUsuariosAdmin } from "../hooks/admin/useUsuariosAdmin";
 
-import "../styles/Login.css";
+import "../styles/Dashboard.css";
 
 const ABAS = [
   { id: "eventos", icone: "bi-calendar-event", label: "Eventos" },

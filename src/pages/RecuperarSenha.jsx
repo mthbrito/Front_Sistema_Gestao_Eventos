@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { authService } from "../services/authService";
-import "../styles/Login.css";
+import "../styles/RecuperarSenha.css";
 
 export default function RecuperarSenha() {
   const navigate = useNavigate();
