@@ -7,7 +7,7 @@ import SenhaInput from "./SenhaInput";
 import AuthAlerta from "./AuthAlerta";
 import LoginFooter from "./LoginFooter";
 
-export default function LoginForm() {
+export default function LoginFormulario() {
   const navigate = useNavigate();
 
   const {
@@ -26,7 +26,13 @@ export default function LoginForm() {
   return (
     <div className="container">
       <div className="row justify-content-center">
-        <div className="col-lg-5">
+        <div className="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+
+          {/* Shapes decorativos */}
+          <div className="sge-bg-shape sge-bg-shape-1" />
+          <div className="sge-bg-shape sge-bg-shape-2" />
+          <div className="sge-bg-shape sge-bg-shape-3" />
+
           <div className="card sge-login-card shadow-lg border-0">
             <div className="card-body p-4 p-md-5">
               <LoginHeader />
@@ -35,7 +41,7 @@ export default function LoginForm() {
                 <AuthAlerta message={erro} onClose={() => setErro("")} />
               )}
 
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
                 <EmailInput value={email} onChange={setEmail} />
 
                 <SenhaInput
@@ -43,16 +49,27 @@ export default function LoginForm() {
                   onChange={setSenha}
                   mostrarSenha={mostrarSenha}
                   toggleSenha={() => setMostrarSenha(!mostrarSenha)}
-                  onEsqueceuSenha={() => navigate("/recuperarSenha")}
+                  onEsqueceuSenha={() => navigate("/recuperar-senha")}
                 />
 
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100"
-                  disabled={carregando}
-                >
-                  {carregando ? "Entrando..." : "Entrar"}
-                </button>
+                <div className="d-grid">
+                  <button
+                    type="submit"
+                    className="btn btn-primary sge-btn-login"
+                    disabled={carregando}
+                  >
+                    {carregando ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                        Entrando...
+                      </>
+                    ) : (
+                      <>
+                        Entrar <i className="bi bi-arrow-right ms-1" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
 
               <LoginFooter />
