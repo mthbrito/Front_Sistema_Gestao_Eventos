@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { notificacaoSchema } from "../../../utils/schemas";
 
 const criarEstadoInicial = () => ({
   mensagem: "",
@@ -24,27 +26,39 @@ export default function NotificacaoFormulario({
   };
 
   const selecionarTodosUsuarios = () => {
-    setDados((atual) => ({
-      ...atual,
-      enviarParaTodos: true,
-      usuarioId: "",
-    }));
+    setDados((atual) => ({ ...atual, enviarParaTodos: true, usuarioId: "" }));
   };
 
   const selecionarUsuarioEspecifico = () => {
-    setDados((atual) => ({
-      ...atual,
-      enviarParaTodos: false,
-    }));
+    setDados((atual) => ({ ...atual, enviarParaTodos: false }));
   };
+
+  const montarPayload = (dados) => ({
+    mensagem: dados.mensagem.trim(),
+    usuarioId: dados.enviarParaTodos ? null : (dados.usuarioId ? Number(dados.usuarioId) : null),
+  });
 
   const handleSubmit = (evento) => {
     evento.preventDefault();
-    onEnviar(montarPayload(dados));
+
+    if (exigeUsuario && !dados.usuarioId) {
+      toast.error("Selecione um usuário.");
+      return;
+    }
+
+    const payload = montarPayload(dados);
+
+    const resultado = notificacaoSchema.safeParse(payload);
+
+    if (!resultado.success) {
+      resultado.error.issues.forEach((issue) => toast.error(issue.message));
+      return;
+    }
+
+    onEnviar(resultado.data);
   };
 
   const exigeUsuario = !dados.enviarParaTodos;
-  const usuarioNaoSelecionado = exigeUsuario && !dados.usuarioId;
 
   return (
     <form onSubmit={handleSubmit} className="row g-3" noValidate>
@@ -61,7 +75,6 @@ export default function NotificacaoFormulario({
           rows={4}
           value={dados.mensagem}
           onChange={atualizarCampo("mensagem")}
-          required
           disabled={salvando}
           placeholder="Digite a mensagem da notificação..."
         />
@@ -125,7 +138,6 @@ export default function NotificacaoFormulario({
               className="form-select sge-input"
               value={dados.usuarioId}
               onChange={atualizarCampo("usuarioId")}
-              required
               disabled={salvando}
             >
               <option value="">Selecione o usuário...</option>
@@ -151,7 +163,7 @@ export default function NotificacaoFormulario({
         <button
           type="submit"
           className="btn sge-btn-login btn-sm text-white"
-          disabled={salvando || usuarioNaoSelecionado}
+          disabled={salvando}
         >
           {salvando ? (
             <span

@@ -22,7 +22,9 @@ export const useInscricoesUsuario = (usuarioId) => {
       invalidar();
     },
     onError: (error) => {
-      toast.error(error, "Erro ao realizar inscrição");
+      const data = error.response?.data;
+      const mensagem = typeof data === "string" ? data : data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
     },
   });
 
@@ -34,7 +36,9 @@ export const useInscricoesUsuario = (usuarioId) => {
         invalidar();
       },
       onError: (error) => {
-        toast.error(error, "Erro ao cancelar inscrição");
+        const data = error.response?.data;
+        const mensagem = typeof data === "string" ? data : data?.message || error.message || "Ocorreu um erro.";
+        toast.error(mensagem);
       },
     });
 

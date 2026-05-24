@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { paraInputDatetimeLocal } from "../../../utils/formatacoes";
+import { eventoSchema } from "../../../utils/schemas";
 
 const TIPOS_EVENTO = ["CURSO", "PALESTRA", "WORKSHOP"];
 
@@ -33,7 +35,7 @@ export default function EventoFormulario({
   const handleSubmit = (evento) => {
     evento.preventDefault();
 
-    onSalvar({
+    const payload = {
       titulo: dados.titulo.trim(),
       descricao: dados.descricao.trim(),
       tipoEvento: dados.tipoEvento,
@@ -41,8 +43,19 @@ export default function EventoFormulario({
       dataTermino: dados.dataTermino,
       salaId: dados.salaId ? Number(dados.salaId) : null,
       organizadorId: dados.organizadorId ? Number(dados.organizadorId) : null,
-    });
+    };
+
+    const resultado = eventoSchema.safeParse(payload);
+
+    if (!resultado.success) {
+      const mensagens = resultado.error.issues.map((e) => e.message);
+      mensagens.forEach((msg) => toast.error(msg));
+      return;
+    }
+
+    onSalvar(resultado.data);
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="row g-3" noValidate>

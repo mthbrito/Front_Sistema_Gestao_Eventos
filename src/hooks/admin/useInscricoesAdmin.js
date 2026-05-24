@@ -27,7 +27,9 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -41,7 +43,9 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -54,7 +58,9 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -70,11 +76,13 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
         toast.success(mensagem);
         queryClient.invalidateQueries({ queryKey: ["admin-inscricoes"] });
       },
-      onError: (error) => {
-        const mensagem =
-          error?.response?.data?.message || error.message || "Ocorreu um erro.";
-        toast.error(mensagem);
-      },
+    onError: (error) => {
+      const mensagem =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
     });
 
   const listaTotal = extrairLista(data);
@@ -86,9 +94,9 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
         : true;
       const okUsuario = filtroUsuario
         ? String(i.usuarioId ?? i.usuario?.id ?? "").includes(filtroUsuario) ||
-          (i.usuarioNome ?? i.usuario?.nome ?? "")
-            .toLowerCase()
-            .includes(filtroUsuario.toLowerCase())
+        (i.usuarioNome ?? i.usuario?.nome ?? "")
+          .toLowerCase()
+          .includes(filtroUsuario.toLowerCase())
         : true;
       return okEvento && okUsuario;
     });

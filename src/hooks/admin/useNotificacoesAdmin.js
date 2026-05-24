@@ -26,7 +26,10 @@ export const useNotificacoesAdmin = () => {
       invalidar();
     },
     onError: (error) => {
-      const mensagem = error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      const mensagem =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -38,7 +41,10 @@ export const useNotificacoesAdmin = () => {
       invalidar();
     },
     onError: (error) => {
-      const mensagem = error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      const mensagem =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });

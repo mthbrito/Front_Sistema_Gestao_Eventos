@@ -8,14 +8,19 @@ import { extrairLista } from "../../utils/paginacao";
 export const useEventosAdmin = () => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data: dataEventos, isLoading: loadingEventos, refetch } = useQuery({
     queryKey: ["admin-eventos"],
-    queryFn: () =>
-      Promise.all([
-        eventoService.listar(0, 100),
-        salaService.listar(0, 100),
-        usuarioService.listar(0, 100),
-      ]),
+    queryFn: () => eventoService.listar(0, 100),
+  });
+
+  const { data: dataSalas, isLoading: loadingSalas } = useQuery({
+    queryKey: ["admin-salas"],
+    queryFn: () => salaService.listar(0, 100),
+  });
+
+  const { data: dataUsuarios, isLoading: loadingUsuarios } = useQuery({
+    queryKey: ["admin-usuarios"],
+    queryFn: () => usuarioService.listar(0, 100),
   });
 
   const invalidar = () =>
@@ -30,7 +35,10 @@ export const useEventosAdmin = () => {
       invalidar();
     },
     onError: (error) => {
-      const mensagem = error?.response?.data?.message || error.message || "Ocorreu um erro."; 
+      const mensagem =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -42,16 +50,19 @@ export const useEventosAdmin = () => {
       invalidar();
     },
     onError: (error) => {
-      const mensagem = error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      const mensagem =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
 
   return {
-    lista: extrairLista(data?.[0]),
-    salas: extrairLista(data?.[1]),
-    organizadores: extrairLista(data?.[2]),
-    carregando: isLoading,
+    lista: extrairLista(dataEventos),
+    salas: extrairLista(dataSalas),
+    organizadores: extrairLista(dataUsuarios),
+    carregando: loadingEventos || loadingSalas || loadingUsuarios,
     salvando: salvandoSalvar || salvandoDeletar,
     salvar,
     deletar,

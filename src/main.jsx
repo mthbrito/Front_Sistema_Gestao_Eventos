@@ -16,6 +16,7 @@ createRoot(document.getElementById("root")).render(
             position="top-center"
             richColors
             toastOptions={{ duration: 5000 }}
+            visibleToasts={7}
           />
           <App />
         </AuthProvider>

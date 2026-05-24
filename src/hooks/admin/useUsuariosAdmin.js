@@ -7,17 +7,20 @@ import { extrairLista } from "../../utils/paginacao";
 export const useUsuariosAdmin = () => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data: dataUsuarios, isLoading: loadingUsuarios, refetch: refetchUsuarios } = useQuery({
     queryKey: ["admin-usuarios"],
-    queryFn: () =>
-      Promise.all([
-        usuarioService.listar(0, 100),
-        perfilService.listar(0, 100),
-      ]),
+    queryFn: () => usuarioService.listar(0, 100),
   });
 
-  const invalidar = () =>
+  const { data: dataPerfis, isLoading: loadingPerfis, refetch: refetchPerfis } = useQuery({
+    queryKey: ["admin-perfis-lista"],
+    queryFn: () => perfilService.listar(0, 100),
+  });
+
+  const invalidar = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-usuarios"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-perfis-lista"] });
+  };
 
   const { mutateAsync: atualizar, isPending: salvandoAtualizar } = useMutation({
     mutationFn: ({ id, dados }) => usuarioService.atualizar(id, dados),
@@ -27,7 +30,9 @@ export const useUsuariosAdmin = () => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -40,18 +45,20 @@ export const useUsuariosAdmin = () => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
 
   return {
-    lista: extrairLista(data?.[0]),
-    perfis: extrairLista(data?.[1]),
-    carregando: isLoading,
+    lista: extrairLista(dataUsuarios),
+    perfis: extrairLista(dataPerfis),
+    carregando: loadingUsuarios || loadingPerfis,
     salvando: salvandoAtualizar || salvandoDeletar,
     atualizar: (id, dados) => atualizar({ id, dados }),
     deletar,
-    recarregar: refetch,
+    recarregar: () => { refetchUsuarios(); refetchPerfis(); },
   };
 };

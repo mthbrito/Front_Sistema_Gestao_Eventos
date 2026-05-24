@@ -56,7 +56,9 @@ export default function AdminDashboard() {
           style={{ borderRadius: "0.75rem" }}
         >
           <div className="card-body p-4">
-            {abaAtiva === "eventos" && <EventosTabela dados={eventos} />}
+            <div hidden={abaAtiva !== "eventos"}>
+              <EventosTabela dados={eventos} />
+            </div>
             {abaAtiva === "usuarios" && <UsuariosTabela dados={usuarios} />}
             {abaAtiva === "inscricoes" && (
               <InscricoesTabela

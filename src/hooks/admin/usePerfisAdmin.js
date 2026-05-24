@@ -22,7 +22,9 @@ export const usePerfisAdmin = () => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });
@@ -35,7 +37,9 @@ export const usePerfisAdmin = () => {
     },
     onError: (error) => {
       const mensagem =
-        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message || error.message || "Ocorreu um erro.";
       toast.error(mensagem);
     },
   });

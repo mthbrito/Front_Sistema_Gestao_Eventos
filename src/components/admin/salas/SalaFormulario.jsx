@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { salaSchema } from "../../../utils/schemas";
 
 const criarEstadoInicial = (sala = {}) => ({
   nome: sala.nome ?? "",
@@ -23,11 +25,20 @@ export default function SalaFormulario({
   const handleSubmit = (evento) => {
     evento.preventDefault();
 
-    onSalvar({
+    const payload = {
       nome: dados.nome.trim(),
       localizacao: dados.localizacao.trim(),
-      capacidade: Number(dados.capacidade),
-    });
+      capacidade: dados.capacidade ? Number(dados.capacidade) : null,
+    };
+
+    const resultado = salaSchema.safeParse(payload);
+
+    if (!resultado.success) {
+      resultado.error.issues.forEach((issue) => toast.error(issue.message));
+      return;
+    }
+
+    onSalvar(resultado.data);
   };
 
   return (
@@ -41,7 +52,6 @@ export default function SalaFormulario({
           className="form-control sge-input"
           value={dados.nome}
           onChange={atualizarCampo("nome")}
-          required
           disabled={salvando}
           placeholder="Ex: Auditório Principal"
         />
@@ -72,7 +82,6 @@ export default function SalaFormulario({
           className="form-control sge-input"
           value={dados.capacidade}
           onChange={atualizarCampo("capacidade")}
-          required
           disabled={salvando}
           placeholder="100"
         />

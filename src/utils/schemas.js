@@ -32,15 +32,23 @@ export const eventoSchema = z
     descricao: z
       .string()
       .min(5, "A descrição deve ter pelo menos 5 caracteres.")
-      .max(300, "A descrição deve ter no máximo 300 caracteres.")
-      .or(z.literal("")),
-    tipoEvento: z.enum(["CURSO", "PALESTRA", "WORKSHOP"], {
-      errorMap: () => ({ message: "Selecione um tipo de evento." }),
-    }),
+      .max(300, "A descrição deve ter no máximo 300 caracteres."),
     dataInicio: z.string().min(1, "Informe a data de início."),
     dataTermino: z.string().min(1, "Informe a data de término."),
-    salaId: z.number().nullable(),
-    organizadorId: z.number().nullable(),
+    tipoEvento: z
+      .enum(["CURSO", "PALESTRA", "WORKSHOP"])
+      .or(z.literal(""))
+      .refine((val) => val !== "", "Selecione um tipo de evento."),
+    salaId: z
+      .number({ invalid_type_error: "Selecione uma sala." })
+      .positive("Selecione uma sala.")
+      .nullable()
+      .refine((val) => val !== null, "Selecione uma sala."),
+    organizadorId: z
+      .number({ invalid_type_error: "Selecione um organizador." })
+      .positive("Selecione um organizador.")
+      .nullable()
+      .refine((val) => val !== null, "Selecione um organizador."),
   })
   .refine(
     (data) =>
@@ -55,10 +63,12 @@ export const eventoSchema = z
 
 export const salaSchema = z.object({
   nome: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
-  localizacao: z.string().optional(),
+  localizacao: z.string().min(2, "A localização deve ter pelo menos 2 caracteres."),
   capacidade: z
     .number({ invalid_type_error: "Informe a capacidade." })
-    .min(1, "A capacidade deve ser pelo menos 1."),
+    .min(1, "A capacidade deve ser pelo menos 1.")
+    .nullable()
+    .refine((val) => val !== null, "Informe a capacidade."),
 });
 
 export const perfilSchema = z.object({
@@ -66,11 +76,17 @@ export const perfilSchema = z.object({
 });
 
 export const notificacaoSchema = z.object({
-  mensagem: z.string().min(5, "A mensagem deve ter pelo menos 5 caracteres."),
-  destinatario: z.string().min(1, "Selecione um destinatário."),
+  mensagem: z.string().min(3, "A mensagem deve ter pelo menos 3 caracteres."),
+  usuarioId: z.number().nullable().optional(),
 });
 
 export const inscricaoSchema = z.object({
-  usuarioId: z.number({ invalid_type_error: "Selecione um usuário." }),
-  eventoId: z.number({ invalid_type_error: "Selecione um evento." }),
+  usuarioId: z
+    .number({ invalid_type_error: "Selecione um usuário." })
+    .nullable()
+    .refine((val) => val !== null, "Selecione um usuário."),
+  eventoId: z
+    .number({ invalid_type_error: "Selecione um evento." })
+    .nullable()
+    .refine((val) => val !== null, "Selecione um evento."),
 });

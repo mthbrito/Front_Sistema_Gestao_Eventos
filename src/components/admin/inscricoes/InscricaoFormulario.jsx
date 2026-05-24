@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { inscricaoSchema } from "../../../utils/schemas";
 
 const criarEstadoInicial = () => ({
   usuarioId: "",
@@ -20,10 +22,20 @@ export default function InscricaoFormulario({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSalvar({
-      usuarioId: Number(dados.usuarioId),
-      eventoId:  Number(dados.eventoId),
-    });
+
+    const payload = {
+      usuarioId: dados.usuarioId ? Number(dados.usuarioId) : null,
+      eventoId: dados.eventoId ? Number(dados.eventoId) : null,
+    };
+
+    const resultado = inscricaoSchema.safeParse(payload);
+
+    if (!resultado.success) {
+      resultado.error.issues.forEach((issue) => toast.error(issue.message));
+      return;
+    }
+
+    onSalvar(resultado.data);
   };
 
   return (
@@ -37,7 +49,6 @@ export default function InscricaoFormulario({
           className="form-select sge-input"
           value={dados.usuarioId}
           onChange={atualizarCampo("usuarioId")}
-          required
           disabled={salvando}
         >
           <option value="">Selecione um usuário...</option>
@@ -58,7 +69,6 @@ export default function InscricaoFormulario({
           className="form-select sge-input"
           value={dados.eventoId}
           onChange={atualizarCampo("eventoId")}
-          required
           disabled={salvando}
         >
           <option value="">Selecione um evento...</option>
@@ -82,7 +92,7 @@ export default function InscricaoFormulario({
         <button
           type="submit"
           className="btn sge-btn-login btn-sm text-white"
-          disabled={salvando || !dados.usuarioId || !dados.eventoId}
+          disabled={salvando}
         >
           {salvando ? (
             <span
