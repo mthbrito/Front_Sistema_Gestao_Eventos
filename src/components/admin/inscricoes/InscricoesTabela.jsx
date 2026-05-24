@@ -2,22 +2,21 @@ import { useState } from "react";
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
 import { formatarData } from "../../../utils/formatacoes";
-import { AlertaFeedback } from "../../AlertaFeedback";
-import { SpinnerCentral } from "../../SpinnerCentral";
-import { TabelaVazia } from "../../TabelaVazia";
-import { BaseModal } from "../BaseModal";
-import { ConfirmacaoModal } from "../ConfirmacaoModal";
-import { InscricaoFormulario } from "./InscricaoFormulario";
+import SpinnerCentral from "../../SpinnerCentral";
+import TabelaVazia from "../../TabelaVazia";
+import BaseModal from "../BaseModal";
+import ConfirmacaoModal from "../ConfirmacaoModal";
+import InscricaoFormulario from "./InscricaoFormulario";
 
 const CLASSE_STATUS = {
   CONFIRMADA: "sge-badge-confirmada",
-  CANCELADA:  "sge-badge-cancelada",
-  PENDENTE:   "sge-badge-pendente",
+  CANCELADA: "sge-badge-cancelada",
+  PENDENTE: "sge-badge-pendente",
 };
 
 const classeStatus = (status) => CLASSE_STATUS[status] ?? "sge-badge-pendente";
 
-export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
+export default function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
   const {
     lista,
     listaTotal,
@@ -27,23 +26,19 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
     setFiltroUsuario,
     carregando,
     salvando,
-    sucesso,
-    setSucesso,
-    erro,
-    setErro,
     salvar,
     confirmar,
     cancelar,
     marcarPresenca,
   } = dados;
 
-  const modal        = useModalEdicao();
-  const confirmacao  = useConfirmacao();
+  const modal = useModalEdicao();
+  const confirmacao = useConfirmacao();
   const [tipoAcao, setTipoAcao] = useState(null);
 
   const handleSalvar = async (dadosFormulario) => {
-    const ok = await salvar(dadosFormulario);
-    if (ok) modal.fechar();
+    await salvar(dadosFormulario);
+    modal.fechar();
   };
 
   const limparConfirmacao = () => {
@@ -61,40 +56,38 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
   };
 
   const handleConfirmarAcao = async () => {
-    const ok =
-      tipoAcao === "confirmar"
-        ? await confirmar(confirmacao.id)
-        : await cancelar(confirmacao.id);
-    if (ok) limparConfirmacao();
+    if (tipoAcao === "confirmar") {
+      await confirmar(confirmacao.id);
+    } else {
+      await cancelar(confirmacao.id);
+    }
+    limparConfirmacao();
   };
 
   const handleAlternarPresenca = (inscricao) => {
     marcarPresenca(inscricao.id, !inscricao.presente);
   };
 
-  const totalExibido  = lista.length;
-  const totalGeral    = listaTotal?.length ?? totalExibido;
+  const totalExibido = lista.length;
+  const totalGeral = listaTotal?.length ?? totalExibido;
   const contadorTitulo =
     totalExibido === totalGeral
       ? `Gerenciar inscrições (${totalExibido})`
       : `Gerenciar inscrições (${totalExibido} de ${totalGeral})`;
 
-  const tituloModal    = tipoAcao === "confirmar" ? "Confirmar inscrição" : "Excluir inscrição";
+  const tituloModal =
+    tipoAcao === "confirmar" ? "Confirmar inscrição" : "Excluir inscrição";
   const textoBotaoModal = tipoAcao === "confirmar" ? "Confirmar" : "Excluir";
-  const varianteModal  = tipoAcao === "confirmar" ? "success" : "danger";
+  const varianteModal = tipoAcao === "confirmar" ? "success" : "danger";
 
   return (
     <>
-      <AlertaFeedback
-        sucesso={sucesso}
-        erro={erro}
-        onFecharSucesso={() => setSucesso("")}
-        onFecharErro={() => setErro("")}
-      />
-
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <h6 className="fw-bold text-body-emphasis mb-0">
-          <i className="bi bi-bookmark-check me-2 text-primary" aria-hidden="true" />
+          <i
+            className="bi bi-bookmark-check me-2 text-primary"
+            aria-hidden="true"
+          />
           {contadorTitulo}
         </h6>
         <div className="d-flex gap-2 flex-wrap align-items-center">
@@ -138,7 +131,10 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
       {carregando ? (
         <SpinnerCentral />
       ) : lista.length === 0 ? (
-        <TabelaVazia icone="bi-bookmark-x" texto="Nenhuma inscrição encontrada." />
+        <TabelaVazia
+          icone="bi-bookmark-x"
+          texto="Nenhuma inscrição encontrada."
+        />
       ) : (
         <div className="table-responsive">
           <table className="table table-hover align-middle small">
@@ -149,16 +145,22 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
                 <th scope="col">Status</th>
                 <th scope="col">Presente</th>
                 <th scope="col">Data</th>
-                <th scope="col" className="text-end">Ações</th>
+                <th scope="col" className="text-end">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody>
               {lista.map((inscricao) => (
                 <tr key={inscricao.id}>
                   <td className="fw-semibold">{inscricao.usuarioNome}</td>
-                  <td className="text-body-secondary">{inscricao.eventoNome}</td>
+                  <td className="text-body-secondary">
+                    {inscricao.eventoNome}
+                  </td>
                   <td>
-                    <span className={`sge-badge-status ${classeStatus(inscricao.status)}`}>
+                    <span
+                      className={`sge-badge-status ${classeStatus(inscricao.status)}`}
+                    >
                       {inscricao.status}
                     </span>
                   </td>
@@ -191,7 +193,9 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
                           type="button"
                           className="btn btn-outline-success btn-sm"
                           aria-label={`Confirmar inscrição de ${inscricao.usuarioNome}`}
-                          onClick={() => abrirConfirmacao("confirmar", inscricao)}
+                          onClick={() =>
+                            abrirConfirmacao("confirmar", inscricao)
+                          }
                           disabled={salvando}
                         >
                           <i className="bi bi-check-lg" aria-hidden="true" />
@@ -202,7 +206,9 @@ export function InscricoesTabela({ dados, eventos = [], usuarios = [] }) {
                           type="button"
                           className="btn btn-outline-danger btn-sm"
                           aria-label={`Excluir inscrição de ${inscricao.usuarioNome}`}
-                          onClick={() => abrirConfirmacao("cancelar", inscricao)}
+                          onClick={() =>
+                            abrirConfirmacao("cancelar", inscricao)
+                          }
                           disabled={salvando}
                         >
                           <i className="bi bi-trash3" aria-hidden="true" />

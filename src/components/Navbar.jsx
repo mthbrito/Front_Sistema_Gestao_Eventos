@@ -1,4 +1,4 @@
-export function Navbar({ onSair }) {
+export default function Navbar({ onSair }) {
   return (
     <nav className="navbar navbar-light bg-white border-bottom shadow-sm px-4 py-3">
       <div className="d-flex align-items-center gap-2">

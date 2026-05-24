@@ -13,7 +13,7 @@ const criarEstadoInicial = (evento = {}) => ({
   organizadorId: String(evento.organizadorId ?? evento.organizador?.id ?? ""),
 });
 
-export function EventoFormulario({
+export default function EventoFormulario({
   valoresIniciais = {},
   salas = [],
   organizadores = [],

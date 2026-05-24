@@ -1,50 +1,29 @@
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
-import { AlertaFeedback } from "../../AlertaFeedback";
-import { SpinnerCentral } from "../../SpinnerCentral";
-import { TabelaVazia } from "../../TabelaVazia";
-import { BaseModal } from "../BaseModal";
-import { ConfirmacaoModal } from "../ConfirmacaoModal";
-import { UsuarioFormulario } from "./UsuarioFormulario";
+import SpinnerCentral from "../../SpinnerCentral";
+import TabelaVazia from "../../TabelaVazia";
+import BaseModal from "../BaseModal";
+import ConfirmacaoModal from "../ConfirmacaoModal";
+import UsuarioFormulario from "./UsuarioFormulario";
 
-export function UsuariosTabela({ dados }) {
-  const {
-    lista,
-    perfis,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
-    atualizar,
-    deletar,
-  } = dados;
+export default function UsuariosTabela({ dados }) {
+  const { lista, perfis, carregando, salvando, atualizar, deletar } = dados;
 
   const modal = useModalEdicao();
   const confirmacao = useConfirmacao();
 
   const handleSalvar = async (dadosFormulario) => {
-    const ok = await atualizar(modal.itemAtual.id, dadosFormulario);
-
-    if (ok) modal.fechar();
+    await atualizar(modal.itemAtual.id, dadosFormulario);
+    modal.fechar();
   };
 
   const handleConfirmarExclusao = async () => {
-    const ok = await deletar(confirmacao.id);
-
-    if (ok) confirmacao.cancelar();
+    await deletar(confirmacao.id);
+    confirmacao.cancelar();
   };
 
   return (
     <>
-      <AlertaFeedback
-        sucesso={sucesso}
-        erro={erro}
-        onFecharSucesso={() => setSucesso("")}
-        onFecharErro={() => setErro("")}
-      />
-
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h6 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-people me-2 text-primary" aria-hidden="true" />
@@ -90,7 +69,8 @@ export function UsuariosTabela({ dados }) {
                       {(usuario.perfis ?? []).map((perfil) => (
                         <span
                           key={perfil.id ?? perfil.nome}
-                          className="sge-badge-tipo"                        >
+                          className="sge-badge-tipo"
+                        >
                           {perfil.nome ?? perfil}
                         </span>
                       ))}

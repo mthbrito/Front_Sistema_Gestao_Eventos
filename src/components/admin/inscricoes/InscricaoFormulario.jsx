@@ -5,7 +5,7 @@ const criarEstadoInicial = () => ({
   eventoId: "",
 });
 
-export function InscricaoFormulario({
+export default function InscricaoFormulario({
   usuarios = [],
   eventos = [],
   onSalvar,

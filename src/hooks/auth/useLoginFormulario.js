@@ -1,40 +1,48 @@
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { loginSchema } from "../../utils/schemas";
 import { useAuth } from "./useAuth";
+import { toast } from "sonner";
 
 export function useLoginFormulario() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
-  const [carregando, setCarregando] = useState(false);
 
   const { login } = useAuth();
 
-  async function handleSubmit(e) {
+  const mutation = useMutation({
+    mutationFn: ({ email, senha }) => login(email, senha),
+
+    onSuccess: () => {
+      toast.success("Login realizado com sucesso!");
+    },
+
+    onError: (error) => {
+      const mensagem = error?.response?.data?.message || "Erro ao realizar login.";
+      toast.error(mensagem);
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    setCarregando(true);
-    setErro("");
+    const resultado = loginSchema.safeParse({ email, senha });
 
-    try {
-      await login(email, senha);
-    } catch (err) {
-      setErro(
-        err.message ||
-          "E-mail ou senha inválidos."
-      );
-    } finally {
-      setCarregando(false);
+    if (resultado.error) {
+      const mensagem = resultado.error.issues[0].message;
+      toast.error(mensagem);
+      return;
     }
-  }
+
+    mutation.mutate({ email, senha });
+  };
 
   return {
     email,
     senha,
-    erro,
-    carregando,
+    carregando: mutation.isPending,
     setEmail,
     setSenha,
-    setErro,
     handleSubmit,
   };
 }

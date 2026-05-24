@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/auth/useAuth";
-import LoginFormulario from "../components/auth/LoginFormulario";
-import "../styles/Login.css";
+import LoginFormulario from "../components/auth/login/LoginFormulario";
+import "../styles/login.css";
 
 export default function Login() {
   const { user } = useAuth();

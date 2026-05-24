@@ -1,24 +1,16 @@
 import { useState } from "react";
-import { useCadastroFormulario } from "../../hooks/auth/useCadastroFormulario";
-import CadastroHeader from "./CadastroHeader";
-import NomeInput from "./NomeInput";
-import EmailInput from "./EmailInput";
-import FuncaoSelect from "./FuncaoSelect";
-import SenhaInput from "./SenhaInput";
-import SenhaConfirmacaoInput from "./SenhaConfirmacaoInput";
-import AuthAlerta from "./AuthAlerta";
+import { useCadastroFormulario } from "../../../hooks/auth/useCadastroFormulario";
+import EmailInput from "../../EmailInput";
+import FuncaoSelect from "../../FuncaoSelect";
+import NomeInput from "../../NomeInput";
+import SenhaConfirmacaoInput from "../../SenhaConfirmacaoInput";
+import SenhaInput from "../../SenhaInput";
 import CadastroFooter from "./CadastroFooter";
+import CadastroHeader from "./CadastroHeader";
 
 export default function CadastroFormulario() {
-  const {
-    form,
-    carregando,
-    erro,
-    sucesso,
-    setErro,
-    handleChange,
-    handleSubmit,
-  } = useCadastroFormulario();
+  const { form, carregando, sucesso, handleChange, handleSubmit } =
+    useCadastroFormulario();
 
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
@@ -41,10 +33,6 @@ export default function CadastroFormulario() {
                   <i className="bi bi-check-circle-fill me-2" />
                   Cadastro realizado! Redirecionando para o login...
                 </div>
-              )}
-
-              {erro && (
-                <AuthAlerta message={erro} onClose={() => setErro("")} />
               )}
 
               {!sucesso && (

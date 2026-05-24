@@ -1,8 +1,7 @@
 import { request } from "./api";
 
 export const perfilService = {
-  listar: (page = 0, size = 10) =>
-    request("GET", `/api/sge/perfis?page=${page}&size=${size}`),
+  listar: (page = 0, size = 10) => request("GET", "/api/sge/perfis", null, { page, size }),
 
   buscarPorId: (id) => request("GET", `/api/sge/perfis/${id}`),
 

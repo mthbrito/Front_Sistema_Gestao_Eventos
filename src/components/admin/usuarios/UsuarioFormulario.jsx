@@ -7,7 +7,7 @@ const criarEstadoInicial = (usuario = {}) => ({
   perfis: usuario.perfis?.map((perfil) => Number(perfil.id ?? perfil)) ?? [],
 });
 
-export function UsuarioFormulario({
+export default function UsuarioFormulario({
   valoresIniciais = {},
   perfis = [],
   onSalvar,
@@ -50,7 +50,10 @@ export function UsuarioFormulario({
       </div>
 
       <div className="col-12">
-        <label htmlFor="usuario-funcao" className="form-label fw-semibold small">
+        <label
+          htmlFor="usuario-funcao"
+          className="form-label fw-semibold small"
+        >
           Função
         </label>
         <select

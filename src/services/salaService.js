@@ -1,8 +1,7 @@
 import { request } from "./api";
 
 export const salaService = {
-  listar: (page = 0, size = 10) =>
-    request("GET", `/api/sge/salas?page=${page}&size=${size}`),
+  listar: (page = 0, size = 10) => request("GET", "/api/sge/salas", null, { page, size }),
 
   buscarPorId: (id) => request("GET", `/api/sge/salas/${id}`),
 

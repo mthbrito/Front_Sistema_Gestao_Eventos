@@ -1,118 +1,50 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { inscricaoService } from "../../services/inscricaoService";
-import { extrairLista } from "../../utils/formatacoes";
-
-const mensagemErro = (e, padrao) => e?.message ?? padrao;
+import { extrairLista } from "../../utils/paginacao";
 
 export const useInscricoesUsuario = (usuarioId) => {
-  const [minhasInscricoes, setMinhasInscricoes] = useState([]);
-  const [carregando, setCarregando] = useState(false);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
-  const [versao, setVersao] = useState(0);
-  const timerRef = useRef(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    return () => clearTimeout(timerRef.current);
-  }, []);
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["inscricoes", usuarioId],
+    queryFn: () => inscricaoService.listarPorUsuario(usuarioId),
+    enabled: !!usuarioId,
+  });
 
-  useEffect(() => {
-    if (!usuarioId) return;
+  const invalidar = () =>
+    queryClient.invalidateQueries({ queryKey: ["inscricoes", usuarioId] });
 
-    let ativo = true;
-
-    const carregar = async () => {
-      setCarregando(true);
-      setErro("");
-
-      try {
-        const data = await inscricaoService.listarPorUsuario(usuarioId);
-
-        if (!ativo) return;
-
-        setMinhasInscricoes(extrairLista(data));
-      } catch (e) {
-        if (!ativo) return;
-
-        setErro(
-          mensagemErro(e, "Erro ao carregar inscrições."),
-        );
-        setSucesso("");
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    };
-
-    carregar();
-
-    return () => {
-      ativo = false;
-    };
-  }, [usuarioId, versao]);
-
-  const recarregar = useCallback(() => {
-    setVersao((v) => v + 1);
-  }, []);
-
-  const mostrarSucesso = useCallback((msg) => {
-    setSucesso(msg);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setSucesso(""), 6000);
-  }, []);
-
-  const inscrever = useCallback(
-    async (eventoId) => {
-      setSalvando(true);
-      setSucesso("");
-      setErro("");
-
-      try {
-        await inscricaoService.salvar({ usuarioId, eventoId });
-        mostrarSucesso("Inscrição realizada com sucesso!");
-        recarregar();
-      } catch (e) {
-        setErro(
-          mensagemErro(e, "Erro ao realizar inscrição."),
-        );
-      } finally {
-        setSalvando(false);
-      }
+  const { mutateAsync: inscrever, isPending: salvandoInscrever } = useMutation({
+    mutationFn: (eventoId) => inscricaoService.salvar({ usuarioId, eventoId }),
+    onSuccess: () => {
+      toast.success("Inscrição realizada com sucesso!");
+      invalidar();
     },
-    [usuarioId, recarregar, mostrarSucesso],
-  );
-
-  const desinscrever = useCallback(
-    async (inscricaoId) => {
-      setSalvando(true);
-      setSucesso("");
-      setErro("");
-
-      try {
-        await inscricaoService.deletar(inscricaoId);
-        mostrarSucesso("Inscrição cancelada com sucesso!");
-        recarregar();
-      } catch (e) {
-        setErro(
-          mensagemErro(e, "Erro ao cancelar inscrição."),
-        );
-      } finally {
-        setSalvando(false);
-      }
+    onError: (error) => {
+      toast.error(error, "Erro ao realizar inscrição");
     },
-    [recarregar, mostrarSucesso],
-  );
+  });
+
+  const { mutateAsync: desinscrever, isPending: salvandoCancelar } =
+    useMutation({
+      mutationFn: (inscricaoId) => inscricaoService.deletar(inscricaoId),
+      onSuccess: () => {
+        toast.success("Inscrição cancelada com sucesso!");
+        invalidar();
+      },
+      onError: (error) => {
+        toast.error(error, "Erro ao cancelar inscrição");
+      },
+    });
 
   return {
-    minhasInscricoes,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
+    lista: extrairLista(data),
+    carregando: isLoading,
+    salvando: salvandoInscrever || salvandoCancelar,
+    erro: error ? "Erro ao carregar inscrições" : undefined,
     inscrever,
     desinscrever,
-    recarregar,
+    recarregar: refetch,
   };
 };

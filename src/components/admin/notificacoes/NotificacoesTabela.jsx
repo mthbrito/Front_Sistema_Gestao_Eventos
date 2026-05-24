@@ -1,57 +1,30 @@
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
-import { formatarData } from "../../../utils/formatacoes";
-import { AlertaFeedback } from "../../AlertaFeedback";
-import { SpinnerCentral } from "../../SpinnerCentral";
-import { TabelaVazia } from "../../TabelaVazia";
-import { BaseModal } from "../BaseModal";
-import { ConfirmacaoModal } from "../ConfirmacaoModal";
-import { NotificacaoFormulario } from "./NotificacaoFormulario";
+import { formatarData, formatarDestinatario } from "../../../utils/formatacoes";
+import SpinnerCentral from "../../SpinnerCentral";
+import TabelaVazia from "../../TabelaVazia";
+import BaseModal from "../BaseModal";
+import ConfirmacaoModal from "../ConfirmacaoModal";
+import NotificacaoFormulario from "./NotificacaoFormulario";
 
-const formatarDestinatario = (notificacao) => {
-  if (notificacao.destinatario === "TODOS") return "Todos";
-
-  return notificacao.destinatario?.nome ?? notificacao.destinatario ?? "—";
-};
-
-export function NotificacoesTabela({ dados }) {
-  const {
-    lista,
-    usuarios,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
-    enviar,
-    deletar,
-  } = dados;
+export default function NotificacoesTabela({ dados }) {
+  const { lista, usuarios, carregando, salvando, enviar, deletar } = dados;
 
   const modal = useModalEdicao();
   const confirmacao = useConfirmacao();
 
   const handleEnviar = async (dadosFormulario) => {
-    const ok = await enviar(dadosFormulario);
-
-    if (ok) modal.fechar();
+    await enviar(dadosFormulario);
+    modal.fechar();
   };
 
   const handleConfirmarExclusao = async () => {
-    const ok = await deletar(confirmacao.id);
-
-    if (ok) confirmacao.cancelar();
+    await deletar(confirmacao.id);
+    confirmacao.cancelar();
   };
 
   return (
     <>
-      <AlertaFeedback
-        sucesso={sucesso}
-        erro={erro}
-        onFecharSucesso={() => setSucesso("")}
-        onFecharErro={() => setErro("")}
-      />
-
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h6 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-bell me-2 text-primary" aria-hidden="true" />

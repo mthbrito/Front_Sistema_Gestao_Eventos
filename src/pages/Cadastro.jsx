@@ -1,5 +1,5 @@
-import CadastroFormulario from "../components/auth/CadastroFormulario";
-import "../styles/Cadastro.css";
+import CadastroFormulario from "../components/auth/cadastro/CadastroFormulario";
+import "../styles/cadastro.css";
 
 export default function Cadastro() {
   return (

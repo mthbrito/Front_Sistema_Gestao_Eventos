@@ -1,4 +1,4 @@
-export function ConfirmacaoModal({ aberto, titulo, mensagem, textoBotao = "Confirmar", variante = "danger", onConfirmar, onCancelar, carregando }) {
+export default function ConfirmacaoModal({ aberto, titulo, mensagem, textoBotao = "Confirmar", variante = "danger", onConfirmar, onCancelar, carregando }) {
   if (!aberto) return null;
 
   return (

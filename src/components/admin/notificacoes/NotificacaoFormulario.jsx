@@ -11,7 +11,7 @@ const montarPayload = (dados) => ({
   destinatario: dados.enviarParaTodos ? "TODOS" : dados.usuarioId,
 });
 
-export function NotificacaoFormulario({
+export default function NotificacaoFormulario({
   usuarios = [],
   onEnviar,
   onCancelar,

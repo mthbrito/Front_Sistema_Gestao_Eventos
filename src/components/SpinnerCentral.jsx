@@ -1,4 +1,4 @@
-export function SpinnerCentral() {
+export default function SpinnerCentral() {
   return (
     <div className="text-center py-5">
       <div className="spinner-border text-primary" role="status" />

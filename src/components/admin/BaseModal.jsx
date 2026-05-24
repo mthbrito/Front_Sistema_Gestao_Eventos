@@ -1,4 +1,4 @@
-export function BaseModal({ titulo, children, onFechar }) {
+export default function BaseModal({ titulo, children, onFechar }) {
   return (
     <div
       className="modal fade show d-block"

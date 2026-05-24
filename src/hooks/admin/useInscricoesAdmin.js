@@ -1,152 +1,108 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { inscricaoService } from "../../services/inscricaoService";
-
-const mensagemErro = (e) => e?.message ?? "Erro desconhecido";
+import { extrairLista } from "../../utils/paginacao";
 
 export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
-  const [lista, setLista] = useState([]);
-  const [carregando, setCarregando] = useState(false);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
+  const queryClient = useQueryClient();
   const [filtroEvento, setFiltroEvento] = useState("");
   const [filtroUsuario, setFiltroUsuario] = useState("");
-  const [versao, setVersao] = useState(0);
 
-  useEffect(() => {
-    let ativo = true;
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-inscricoes"],
+    queryFn: () => inscricaoService.listar(0, 200),
+  });
 
-    const carregar = async () => {
-      setCarregando(true);
-      setErro("");
-
-      try {
-        const res = await inscricaoService.listar(0, 200);
-
-        if (!ativo) return;
-
-        setLista(res?.content ?? res ?? []);
-      } catch (e) {
-        if (!ativo) return;
-
-        setErro(mensagemErro(e));
-        setSucesso("");
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    };
-
-    carregar();
-
-    return () => {
-      ativo = false;
-    };
-  }, [versao]);
-
-  const recarregar = useCallback(() => {
-    setVersao((v) => v + 1);
-  }, []);
-
-  const salvar = useCallback(async (dados) => {
-  setSalvando(true);
-  setErro("");
-  setSucesso("");
-
-  try {
-    await inscricaoService.salvar(dados);
-    setSucesso("Inscrição criada!");
-    setVersao((v) => v + 1);
+  const invalidar = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-inscricoes"] });
     onAtualizar?.();
-    return true;
-  } catch (e) {
-    setErro(mensagemErro(e));
-    return false;
-  } finally {
-    setSalvando(false);
-  }
-}, [onAtualizar]);
+  };
 
-  const confirmar = useCallback(async (id) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
+  const { mutateAsync: salvar, isPending: salvandoSalvar } = useMutation({
+    mutationFn: (dados) => inscricaoService.salvar(dados),
+    onSuccess: () => {
+      toast.success("Inscrição criada!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
-    try {
-      await inscricaoService.atualizar(id, { status: "CONFIRMADA" });
-      setSucesso("Inscrição confirmada!");
-      setVersao((v) => v + 1);
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
+  const { mutateAsync: confirmar, isPending: salvandoConfirmar } = useMutation({
+    mutationFn: (id) =>
+      inscricaoService.atualizar(id, { status: "CONFIRMADA" }),
+    onSuccess: () => {
+      toast.success("Inscrição confirmada!");
+      queryClient.invalidateQueries({ queryKey: ["admin-inscricoes"] });
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
-  const cancelar = useCallback(async (id) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
+  const { mutateAsync: cancelar, isPending: salvandoCancelar } = useMutation({
+    mutationFn: (id) => inscricaoService.deletar(id),
+    onSuccess: () => {
+      toast.success("Inscrição excluída!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
-    try {
-      await inscricaoService.deletar(id);
-      setSucesso("Inscrição excluída!");
-      setVersao((v) => v + 1);
-      onAtualizar?.();
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, [onAtualizar]);
+  const { mutateAsync: marcarPresenca, isPending: salvandoPresenca } =
+    useMutation({
+      mutationFn: ({ id, presente }) =>
+        inscricaoService.atualizar(id, { presente }),
+      onSuccess: (_, { presente }) => {
+        const mensagem = presente
+          ? "Presença marcada!"
+          : "Presença desmarcada!";
+        toast.success(mensagem);
+        queryClient.invalidateQueries({ queryKey: ["admin-inscricoes"] });
+      },
+      onError: (error) => {
+        const mensagem =
+          error?.response?.data?.message || error.message || "Ocorreu um erro.";
+        toast.error(mensagem);
+      },
+    });
 
-  const marcarPresenca = useCallback(async (id, presente) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
+  const listaTotal = extrairLista(data);
 
-    try {
-      await inscricaoService.atualizar(id, { presente });
-      setSucesso(presente ? "Presença marcada!" : "Presença desmarcada!");
-      setVersao((v) => v + 1);
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
-
-  const listaFiltrada = useMemo(() => {
-    return lista.filter((i) => {
+  const lista = useMemo(() => {
+    return listaTotal.filter((i) => {
       const okEvento = filtroEvento
         ? String(i.eventoId ?? i.evento?.id ?? "") === String(filtroEvento)
         : true;
-
       const okUsuario = filtroUsuario
         ? String(i.usuarioId ?? i.usuario?.id ?? "").includes(filtroUsuario) ||
           (i.usuarioNome ?? i.usuario?.nome ?? "")
             .toLowerCase()
             .includes(filtroUsuario.toLowerCase())
         : true;
-
       return okEvento && okUsuario;
     });
-  }, [lista, filtroEvento, filtroUsuario]);
+  }, [listaTotal, filtroEvento, filtroUsuario]);
 
   return {
-    lista: listaFiltrada,
-    listaTotal: lista,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
+    lista,
+    listaTotal,
+    carregando: isLoading,
+    salvando:
+      salvandoSalvar ||
+      salvandoConfirmar ||
+      salvandoCancelar ||
+      salvandoPresenca,
     filtroEvento,
     setFiltroEvento,
     filtroUsuario,
@@ -154,7 +110,7 @@ export const useInscricoesAdmin = ({ onAtualizar } = {}) => {
     salvar,
     confirmar,
     cancelar,
-    marcarPresenca,
-    recarregar,
+    marcarPresenca: (id, presente) => marcarPresenca({ id, presente }),
+    recarregar: refetch,
   };
 };

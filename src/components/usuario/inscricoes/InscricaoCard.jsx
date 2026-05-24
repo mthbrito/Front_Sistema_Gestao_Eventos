@@ -1,4 +1,4 @@
-export function InscricaoCard({ inscricao, onDesinscrever }) {
+export default function InscricaoCard({ inscricao, onDesinscrever }) {
   return (
     <div className="col-12 col-md-6">
       <div className="card sge-card border-0 shadow-sm">

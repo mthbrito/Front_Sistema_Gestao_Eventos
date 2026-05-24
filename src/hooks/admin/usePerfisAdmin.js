@@ -1,100 +1,51 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { perfilService } from "../../services/perfilService";
-
-const mensagemErro = (e) => e?.message ?? "Erro desconhecido";
+import { extrairLista } from "../../utils/paginacao";
 
 export const usePerfisAdmin = () => {
-  const [lista, setLista] = useState([]);
-  const [carregando, setCarregando] = useState(false);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
-  const [versao, setVersao] = useState(0);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let ativo = true;
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-perfis"],
+    queryFn: () => perfilService.listar(0, 100),
+  });
 
-    const carregar = async () => {
-      setCarregando(true);
-      setErro("");
+  const invalidar = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin-perfis"] });
 
-      try {
-        const res = await perfilService.listar(0, 100);
+  const { mutateAsync: salvar, isPending: salvandoSalvar } = useMutation({
+    mutationFn: (dados) => perfilService.salvar(dados),
+    onSuccess: () => {
+      toast.success("Perfil criado!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
-        if (!ativo) return;
-
-        setLista(res?.content ?? res ?? []);
-      } catch (e) {
-        if (!ativo) return;
-
-        setErro(mensagemErro(e));
-        setSucesso("");
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    };
-
-    carregar();
-
-    return () => {
-      ativo = false;
-    };
-  }, [versao]);
-
-  const recarregar = useCallback(() => {
-    setVersao((v) => v + 1);
-  }, []);
-
-  const salvar = useCallback(async (dados) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
-
-    try {
-      await perfilService.salvar(dados);
-
-      setSucesso("Perfil criado!");
-      setVersao((v) => v + 1);
-
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
-
-  const deletar = useCallback(async (id) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
-
-    try {
-      await perfilService.deletar(id);
-
-      setSucesso("Perfil removido!");
-      setVersao((v) => v + 1);
-
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
+  const { mutateAsync: deletar, isPending: salvandoDeletar } = useMutation({
+    mutationFn: (id) => perfilService.deletar(id),
+    onSuccess: () => {
+      toast.success("Perfil removido!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
   return {
-    lista,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
+    lista: extrairLista(data),
+    carregando: isLoading,
+    salvando: salvandoSalvar || salvandoDeletar,
     salvar,
     deletar,
-    recarregar,
+    recarregar: refetch,
   };
 };

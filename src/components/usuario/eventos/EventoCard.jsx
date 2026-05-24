@@ -1,6 +1,6 @@
-import { formatarData } from "../utils/formatacoes";
+import { formatarData } from "../../../utils/formatacoes";
 
-export function EventoCard({ evento, onInscrever }) {
+export default function EventoCard({ evento, onInscrever }) {
   return (
     <div className="col-12 col-md-6 col-lg-4">
       <div className="card sge-card h-100 border-0 shadow-sm">
@@ -15,7 +15,7 @@ export function EventoCard({ evento, onInscrever }) {
             </span>
           </div>
           <h6 className="fw-bold text-body-emphasis mb-1">{evento.titulo}</h6>
-          <p className="text-body-secondary small mb-2 flex-grow-1">{evento.descricao}</p>
+          <p className="text-body-secondary small mb-2 grow">{evento.descricao}</p>
           <div className="d-flex flex-column gap-1 small text-body-secondary mb-3">
             <div>
               <i className="bi bi-calendar2 me-1" />

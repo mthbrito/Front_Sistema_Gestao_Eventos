@@ -6,7 +6,7 @@ const criarEstadoInicial = (sala = {}) => ({
   capacidade: sala.capacidade != null ? String(sala.capacidade) : "",
 });
 
-export function SalaFormulario({
+export default function SalaFormulario({
   valoresIniciais = {},
   onSalvar,
   onCancelar,

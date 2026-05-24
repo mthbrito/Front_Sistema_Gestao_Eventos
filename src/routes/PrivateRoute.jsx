@@ -6,7 +6,10 @@ export function PrivateRoute({ role }) {
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-  if (role && user?.role !== role) return <Navigate to="/dashboard" replace />;
+  if (role && user?.role !== role) {
+    const destino = user?.role === "ADMIN" ? "/admin/dashboard" : "/dashboard";
+    return <Navigate to={destino} replace />;
+  }
 
   return <Outlet />;
 }

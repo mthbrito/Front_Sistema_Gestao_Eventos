@@ -1,39 +1,26 @@
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
-import { AlertaFeedback } from "../../AlertaFeedback";
-import { SpinnerCentral } from "../../SpinnerCentral";
-import { TabelaVazia } from "../../TabelaVazia";
-import { BaseModal } from "../BaseModal";
-import { ConfirmacaoModal } from "../ConfirmacaoModal";
-import { SalaFormulario } from "./SalaFormulario";
+import SpinnerCentral from "../../SpinnerCentral";
+import TabelaVazia from "../../TabelaVazia";
+import BaseModal from "../BaseModal";
+import ConfirmacaoModal from "../ConfirmacaoModal";
+import SalaFormulario from "./SalaFormulario";
 
-export function SalasTabela({ dados }) {
-  const {
-    lista,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
-    salvar,
-    deletar,
-  } = dados;
+export default function SalasTabela({ dados }) {
+  const { lista, carregando, salvando, salvar, deletar } = dados;
 
   const modal = useModalEdicao();
   const confirmacao = useConfirmacao();
 
   const handleSalvar = async (dadosFormulario) => {
     const idEdicao = modal.estaEditando ? modal.itemAtual.id : null;
-    const ok = await salvar(dadosFormulario, idEdicao);
-
-    if (ok) modal.fechar();
+    await salvar({ dados: dadosFormulario, id: idEdicao });
+    modal.fechar();
   };
 
   const handleConfirmarExclusao = async () => {
-    const ok = await deletar(confirmacao.id);
-
-    if (ok) confirmacao.cancelar();
+    await deletar(confirmacao.id);
+    confirmacao.cancelar();
   };
 
   const chaveFormulario = modal.estaEditando
@@ -42,13 +29,6 @@ export function SalasTabela({ dados }) {
 
   return (
     <>
-      <AlertaFeedback
-        sucesso={sucesso}
-        erro={erro}
-        onFecharSucesso={() => setSucesso("")}
-        onFecharErro={() => setErro("")}
-      />
-
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h6 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-door-open me-2 text-primary" aria-hidden="true" />

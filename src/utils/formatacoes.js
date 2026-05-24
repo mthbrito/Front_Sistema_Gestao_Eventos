@@ -1,14 +1,19 @@
 export const formatarData = (valor) => {
   if (!valor) return "—";
-
   return new Date(valor).toLocaleDateString("pt-BR", {
     dateStyle: "short",
   });
 };
 
-export const extrairLista = (resposta) => {
-  if (Array.isArray(resposta)) return resposta;
-  return resposta?.content ?? [];
+export const formatarSala = (evento) => {
+  if (!evento.salaNome) return "—";
+  const local = evento.salaLocalizacao ? `${evento.salaLocalizacao} - ` : "";
+  return `${local}${evento.salaNome}`;
+};
+
+export const formatarDestinatario = (notificacao) => {
+  if (notificacao.destinatario === "TODOS") return "Todos";
+  return notificacao.destinatario?.nome ?? notificacao.destinatario ?? "—";
 };
 
 export const paraInputDatetimeLocal = (valor) => {

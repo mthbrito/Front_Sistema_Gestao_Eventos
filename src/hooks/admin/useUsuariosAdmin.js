@@ -1,107 +1,57 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { perfilService } from "../../services/perfilService";
 import { usuarioService } from "../../services/usuarioService";
-
-const mensagemErro = (e) => e?.message ?? "Erro desconhecido";
+import { extrairLista } from "../../utils/paginacao";
 
 export const useUsuariosAdmin = () => {
-  const [lista, setLista] = useState([]);
-  const [perfis, setPerfis] = useState([]);
-  const [carregando, setCarregando] = useState(false);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
-  const [versao, setVersao] = useState(0);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let ativo = true;
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-usuarios"],
+    queryFn: () =>
+      Promise.all([
+        usuarioService.listar(0, 100),
+        perfilService.listar(0, 100),
+      ]),
+  });
 
-    const carregar = async () => {
-      setCarregando(true);
-      setErro("");
+  const invalidar = () =>
+    queryClient.invalidateQueries({ queryKey: ["admin-usuarios"] });
 
-      try {
-        const [resUsuarios, resPerfis] = await Promise.all([
-          usuarioService.listar(0, 100),
-          perfilService.listar(0, 100),
-        ]);
+  const { mutateAsync: atualizar, isPending: salvandoAtualizar } = useMutation({
+    mutationFn: ({ id, dados }) => usuarioService.atualizar(id, dados),
+    onSuccess: () => {
+      toast.success("Usuário atualizado!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
-        if (!ativo) return;
-
-        setLista(resUsuarios?.content ?? resUsuarios ?? []);
-        setPerfis(resPerfis?.content ?? resPerfis ?? []);
-      } catch (e) {
-        if (!ativo) return;
-
-        setErro(mensagemErro(e));
-        setSucesso("");
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    };
-
-    carregar();
-
-    return () => {
-      ativo = false;
-    };
-  }, [versao]);
-
-  const recarregar = useCallback(() => {
-    setVersao((v) => v + 1);
-  }, []);
-
-  const atualizar = useCallback(async (id, dados) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
-
-    try {
-      await usuarioService.atualizar(id, dados);
-
-      setSucesso("Usuário atualizado!");
-      setVersao((v) => v + 1);
-
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
-
-  const deletar = useCallback(async (id) => {
-    setSalvando(true);
-    setErro("");
-    setSucesso("");
-
-    try {
-      await usuarioService.deletar(id);
-
-      setSucesso("Usuário removido!");
-      setVersao((v) => v + 1);
-
-      return true;
-    } catch (e) {
-      setErro(mensagemErro(e));
-      return false;
-    } finally {
-      setSalvando(false);
-    }
-  }, []);
+  const { mutateAsync: deletar, isPending: salvandoDeletar } = useMutation({
+    mutationFn: (id) => usuarioService.deletar(id),
+    onSuccess: () => {
+      toast.success("Usuário removido!");
+      invalidar();
+    },
+    onError: (error) => {
+      const mensagem =
+        error?.response?.data?.message || error.message || "Ocorreu um erro.";
+      toast.error(mensagem);
+    },
+  });
 
   return {
-    lista,
-    perfis,
-    carregando,
-    salvando,
-    erro,
-    setErro,
-    sucesso,
-    setSucesso,
-    atualizar,
+    lista: extrairLista(data?.[0]),
+    perfis: extrairLista(data?.[1]),
+    carregando: isLoading,
+    salvando: salvandoAtualizar || salvandoDeletar,
+    atualizar: (id, dados) => atualizar({ id, dados }),
     deletar,
-    recarregar,
+    recarregar: refetch,
   };
 };

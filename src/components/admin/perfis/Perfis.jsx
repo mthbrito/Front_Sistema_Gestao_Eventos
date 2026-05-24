@@ -1,50 +1,29 @@
 import { useState } from "react";
-import { AlertaFeedback } from "../../AlertaFeedback";
-import { ConfirmacaoModal } from "../ConfirmacaoModal";
-import { SpinnerCentral } from "../../SpinnerCentral";
-import { TabelaVazia } from "../../TabelaVazia";
+import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
+import SpinnerCentral from "../../SpinnerCentral";
+import TabelaVazia from "../../TabelaVazia";
+import ConfirmacaoModal from "../ConfirmacaoModal";
 
-export function Perfis({ dados }) {
-  const {
-    sucesso,
-    erro,
-    setSucesso,
-    setErro,
-    carregando,
-    lista,
-    salvar,
-    deletar,
-  } = dados;
+export default function Perfis({ dados }) {
+  const { carregando, salvando, lista, salvar, deletar } = dados;
 
   const [novoPerfil, setNovoPerfil] = useState("");
-  const [confirmacao, setConfirmacao] = useState(null);
-  const [salvando, setSalvando] = useState(false);
+  const confirmacao = useConfirmacao();
 
   const handleSalvar = async (e) => {
     e.preventDefault();
     if (!novoPerfil.trim()) return;
-    setSalvando(true);
-    const ok = await salvar({ nome: novoPerfil.trim().toUpperCase() });
-    setSalvando(false);
-    if (ok) setNovoPerfil("");
+    await salvar({ nome: novoPerfil.trim().toUpperCase() });
+    setNovoPerfil("");
   };
 
   const handleDeletar = async () => {
-    setSalvando(true);
-    await deletar(confirmacao.item.id);
-    setSalvando(false);
-    setConfirmacao(null);
+    await deletar(confirmacao.id);
+    confirmacao.cancelar();
   };
 
   return (
     <>
-      <AlertaFeedback
-        sucesso={sucesso}
-        erro={erro}
-        onFecharSucesso={() => setSucesso("")}
-        onFecharErro={() => setErro("")}
-      />
-
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h6 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-shield-check me-2 text-primary" />
@@ -62,10 +41,11 @@ export function Perfis({ dados }) {
           placeholder="Nome do novo perfil (ex: MODERADOR)"
           value={novoPerfil}
           onChange={(e) => setNovoPerfil(e.target.value)}
+          disabled={salvando}
         />
         <button
           type="submit"
-          className="btn sge-btn-login btn-sm text-white flex-shrink-0"
+          className="btn sge-btn-login btn-sm text-white shrink-0"
           disabled={salvando || !novoPerfil.trim()}
         >
           {salvando ? (
@@ -93,7 +73,14 @@ export function Perfis({ dados }) {
               <button
                 className="btn btn-link btn-sm p-0 text-danger ms-1"
                 style={{ lineHeight: 1 }}
-                onClick={() => setConfirmacao({ item: p })}
+                aria-label={`Remover perfil ${p.nome}`}
+                onClick={() =>
+                  confirmacao.confirmar(
+                    p.id,
+                    `Tem certeza que deseja remover o perfil "${p.nome}"?`,
+                  )
+                }
+                disabled={salvando}
               >
                 <i className="bi bi-x-lg" style={{ fontSize: "0.7rem" }} />
               </button>
@@ -103,12 +90,12 @@ export function Perfis({ dados }) {
       )}
 
       <ConfirmacaoModal
-        aberto={!!confirmacao}
+        aberto={confirmacao.aberto}
         titulo="Deletar perfil"
-        mensagem={`Tem certeza que deseja remover o perfil "${confirmacao?.item?.nome}"?`}
+        mensagem={confirmacao.mensagem}
         textoBotao="Deletar"
         onConfirmar={handleDeletar}
-        onCancelar={() => setConfirmacao(null)}
+        onCancelar={confirmacao.cancelar}
         carregando={salvando}
       />
     </>

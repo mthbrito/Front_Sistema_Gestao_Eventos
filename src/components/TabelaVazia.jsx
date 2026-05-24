@@ -1,4 +1,4 @@
-export function TabelaVazia({ icone, texto }) {
+export default function TabelaVazia({ icone, texto }) {
   return (
     <div className="text-center py-5 opacity-75">
       <i

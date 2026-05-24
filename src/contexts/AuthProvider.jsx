@@ -1,11 +1,7 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
-import {
-  authService,
-  getToken,
-  removeToken,
-  setToken,
-} from "../services/authService";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { authService } from "../services/authService";
 import { decodificarUsuario } from "../utils/autenticacao";
+import { getToken, removeToken, setToken } from "../utils/token";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
