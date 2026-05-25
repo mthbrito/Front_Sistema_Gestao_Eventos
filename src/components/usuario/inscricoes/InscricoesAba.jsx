@@ -2,7 +2,7 @@ import SpinnerCentral from "../../SpinnerCentral";
 import InscricaoCard from "./InscricaoCard";
 
 export default function InscricoesAba({ dados, onAtualizar, onVerEventos }) {
-  const { lista, carregando } = dados;
+  const { lista, carregando, desinscrever, salvando } = dados;
 
   if (carregando) return <SpinnerCentral />;
 
@@ -43,7 +43,8 @@ export default function InscricoesAba({ dados, onAtualizar, onVerEventos }) {
             <InscricaoCard
               key={inscricao.id}
               inscricao={inscricao}
-              onDesinscrever={dados.desinscrever}
+              onDesinscrever={desinscrever}
+              salvando={salvando}
             />
           ))}
         </div>

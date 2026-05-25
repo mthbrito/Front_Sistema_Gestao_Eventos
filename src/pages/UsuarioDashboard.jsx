@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import EventosAba from "../components/usuario/eventos/EventosAba";
 import InscricoesAba from "../components/usuario/inscricoes/InscricoesAba";
 import NotificacoesAba from "../components/usuario/notificacoes/NotificacoesAba";
+import PerfilAba from "../components/usuario/perfil/PerfilAba";
 import { useAuth } from "../hooks/auth/useAuth";
 import { useDashboardUsuario } from "../hooks/usuario/useDashboardUsuario";
 import "../styles/dashboard.css";
@@ -19,31 +20,20 @@ export default function UsuarioDashboard() {
     notificacoes,
     recarregarTudo,
     totalNotificacoes,
+    editarUsuario,
+    salvandoEdicao,
   } = useDashboardUsuario(user.id);
 
   const ABAS = [
-    { id: "eventos", icone: "bi-calendar-event", label: "Eventos" },
-    {
-      id: "inscricoes",
-      icone: "bi-bookmark-check",
-      label: "Minhas Inscrições",
-    },
-    {
-      id: "notificacoes",
-      icone: "bi-bell",
-      label: "Notificações",
-      badge: totalNotificacoes,
-    },
+    { id: "eventos",      icone: "bi-calendar-event", label: "Eventos"           },
+    { id: "inscricoes",   icone: "bi-bookmark-check", label: "Minhas Inscrições" },
+    { id: "notificacoes", icone: "bi-bell",            label: "Notificações", badge: totalNotificacoes },
+    { id: "perfil",       icone: "bi-person-circle",   label: "Meu Perfil"        },
   ];
 
   return (
     <div className="sge-dash-bg min-vh-100">
-      <Navbar
-        onSair={() => {
-          logout();
-          navigate("/login");
-        }}
-      />
+      <Navbar onSair={() => { logout(); navigate("/login"); }} />
 
       <div className="container py-4">
         <div className="d-flex gap-2 mb-4 flex-wrap">
@@ -56,10 +46,7 @@ export default function UsuarioDashboard() {
               <i className={`bi ${aba.icone} me-2`} />
               {aba.label}
               {aba.badge > 0 && (
-                <span
-                  className="badge bg-danger ms-2 rounded-pill"
-                  style={{ fontSize: "0.65rem" }}
-                >
+                <span className="badge bg-danger ms-2 rounded-pill" style={{ fontSize: "0.65rem" }}>
                   {aba.badge}
                 </span>
               )}
@@ -74,7 +61,6 @@ export default function UsuarioDashboard() {
             onAtualizar={recarregarTudo}
           />
         )}
-
         {abaAtiva === "inscricoes" && (
           <InscricoesAba
             dados={inscricoes}
@@ -82,9 +68,15 @@ export default function UsuarioDashboard() {
             onVerEventos={() => setAbaAtiva("eventos")}
           />
         )}
-
         {abaAtiva === "notificacoes" && (
           <NotificacoesAba dados={notificacoes} onAtualizar={recarregarTudo} />
+        )}
+        {abaAtiva === "perfil" && (
+          <PerfilAba
+            user={user}
+            onSalvar={editarUsuario}
+            salvando={salvandoEdicao}
+          />
         )}
       </div>
     </div>

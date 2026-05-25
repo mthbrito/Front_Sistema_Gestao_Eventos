@@ -1,4 +1,4 @@
-export default function InscricaoCard({ inscricao, onDesinscrever }) {
+export default function InscricaoCard({ inscricao, onDesinscrever, salvando }) {
   return (
     <div className="col-12 col-md-6">
       <div className="card sge-card border-0 shadow-sm">
@@ -19,10 +19,12 @@ export default function InscricaoCard({ inscricao, onDesinscrever }) {
               {inscricao.status}
             </span>
           </div>
-          <p className="text-body-secondary small mb-2">
+
+          <p className="text-body-secondary small mb-3">
             <i className="bi bi-calendar2 me-1" />
             Inscrito em: {inscricao.dataInscricao}
           </p>
+
           <div className="d-flex align-items-center justify-content-between">
             <span
               className={`small ${inscricao.presente ? "text-success" : "text-body-secondary"}`}
@@ -32,13 +34,19 @@ export default function InscricaoCard({ inscricao, onDesinscrever }) {
               />
               {inscricao.presente ? "Presença confirmada" : "Presença pendente"}
             </span>
+
             {inscricao.status !== "CANCELADA" && (
               <button
                 className="btn btn-outline-danger btn-sm"
                 onClick={() => onDesinscrever(inscricao.id)}
+                disabled={salvando}
               >
-                <i className="bi bi-x-circle me-1" />
-                Desinscrever
+                {salvando ? (
+                  <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
+                ) : (
+                  <i className="bi bi-x-circle me-1" />
+                )}
+                Cancelar inscrição
               </button>
             )}
           </div>

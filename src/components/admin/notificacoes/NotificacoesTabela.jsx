@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
 import { formatarData, formatarDestinatario } from "../../../utils/formatacoes";
@@ -9,9 +10,18 @@ import NotificacaoFormulario from "./NotificacaoFormulario";
 
 export default function NotificacoesTabela({ dados }) {
   const { lista, usuarios, carregando, salvando, enviar, deletar } = dados;
+  const [filtro, setFiltro] = useState("");
 
-  const modal = useModalEdicao();
+  const modal       = useModalEdicao();
   const confirmacao = useConfirmacao();
+
+  const listaFiltrada = lista.filter((n) => {
+    if (!filtro.trim()) return true;
+    const termo = filtro.toLowerCase();
+    const mensagem     = (n.mensagem ?? "").toLowerCase();
+    const destinatario = formatarDestinatario(n).toLowerCase();
+    return mensagem.includes(termo) || destinatario.includes(termo);
+  });
 
   const handleEnviar = async (dadosFormulario) => {
     await enviar(dadosFormulario);
@@ -25,7 +35,8 @@ export default function NotificacoesTabela({ dados }) {
 
   return (
     <>
-      <div className="d-flex align-items-center justify-content-between mb-3">
+      {/* Header */}
+      <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <h6 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-bell me-2 text-primary" aria-hidden="true" />
           Notificações enviadas
@@ -41,22 +52,56 @@ export default function NotificacoesTabela({ dados }) {
         </button>
       </div>
 
+      {/* Filtro */}
+      {lista.length > 0 && (
+        <div className="mb-3">
+          <div className="input-group input-group-sm">
+            <span className="input-group-text sge-input-addon">
+              <i className="bi bi-search" aria-hidden="true" />
+            </span>
+            <input
+              type="text"
+              className="form-control sge-input"
+              placeholder="Filtrar por mensagem ou destinatário..."
+              value={filtro}
+              onChange={(e) => setFiltro(e.target.value)}
+            />
+            {filtro && (
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() => setFiltro("")}
+                title="Limpar filtro"
+              >
+                <i className="bi bi-x-lg" />
+              </button>
+            )}
+          </div>
+          {filtro && (
+            <p className="text-body-secondary small mt-1 mb-0">
+              {listaFiltrada.length} de {lista.length} notificação(ões) exibida(s)
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Lista */}
       {carregando ? (
         <SpinnerCentral />
-      ) : lista.length === 0 ? (
+      ) : listaFiltrada.length === 0 ? (
         <TabelaVazia
           icone="bi-bell-slash"
-          texto="Nenhuma notificação enviada."
+          texto={filtro ? "Nenhuma notificação encontrada para esse filtro." : "Nenhuma notificação enviada."}
         />
       ) : (
         <div className="d-flex flex-column gap-2">
-          {lista.map((notificacao) => (
+          {listaFiltrada.map((notificacao) => (
             <div key={notificacao.id} className="card border sge-notif-card">
               <div className="card-body py-3 px-4 d-flex align-items-start gap-3">
-                <div className="sge-notif-icon shrink-0">
+                <div className="sge-notif-icon flex-shrink-0">
                   <i className="bi bi-bell-fill" aria-hidden="true" />
                 </div>
-                <div className="grow-0">
+                <div className="flex-grow-1">
                   <p className="mb-1 small fw-semibold text-body-emphasis">
                     {notificacao.mensagem}
                   </p>
@@ -76,13 +121,13 @@ export default function NotificacoesTabela({ dados }) {
                 </div>
                 <button
                   type="button"
-                  className="btn btn-outline-danger btn-sm shrink-0"
+                  className="btn btn-outline-danger btn-sm flex-shrink-0"
                   title="Excluir"
                   aria-label="Excluir notificação"
                   onClick={() =>
                     confirmacao.confirmar(
                       notificacao.id,
-                      "Tem certeza que deseja remover esta notificação?",
+                      "Tem certeza que deseja remover esta notificação?"
                     )
                   }
                   disabled={salvando}
