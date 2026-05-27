@@ -1,4 +1,4 @@
-import SpinnerCentral from "../../SpinnerCentral";
+import SpinnerCentral from "../../shared/SpinnerCentral";
 import NotificacaoCard from "./NotificacaoCard";
 
 export default function NotificacoesAba({ dados, onAtualizar }) {
@@ -11,7 +11,7 @@ export default function NotificacoesAba({ dados, onAtualizar }) {
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <h5 className="fw-bold text-body-emphasis mb-0">
           <i className="bi bi-bell me-2 text-primary" />
-          Notificações
+          Notificações recebidas
         </h5>
         <div className="d-flex gap-2">
           {lista.length > 0 && (

@@ -49,13 +49,23 @@ export const useNotificacoesAdmin = () => {
     },
   });
 
+  const { mutateAsync: deletarVarios, isPending: salvandoDeletarVarios } = useMutation({
+    mutationFn: (ids) => Promise.all(ids.map((id) => notificacaoService.deletar(id))),
+    onSuccess: () => {
+      toast.success("Notificações removidas!");
+      invalidar();
+    },
+    onError: () => toast.error("Erro ao remover notificações."),
+  });
+
   return {
     lista: extrairLista(data?.[0]),
     usuarios: extrairLista(data?.[1]),
     carregando: isLoading,
-    salvando: salvandoEnviar || salvandoDeletar,
+    salvando: salvandoEnviar || salvandoDeletar || salvandoDeletarVarios,
     enviar,
     deletar,
+    deletarVarios,
     recarregar: refetch,
   };
 };

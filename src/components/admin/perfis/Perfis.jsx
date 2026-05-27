@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
-import SpinnerCentral from "../../SpinnerCentral";
-import TabelaVazia from "../../TabelaVazia";
 import ConfirmacaoModal from "../ConfirmacaoModal";
+import SpinnerCentral from "../../shared/SpinnerCentral";
+import TabelaVazia from "../../shared/TabelaVazia";
 
 export default function Perfis({ dados }) {
   const { carregando, salvando, lista, salvar, deletar } = dados;

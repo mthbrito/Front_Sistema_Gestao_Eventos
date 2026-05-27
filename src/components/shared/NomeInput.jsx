@@ -18,7 +18,7 @@ export default function NomeInput({ value, onChange }) {
           name="nome"
           placeholder="Seu nome"
           value={value}
-          onChange={onChange}
+          onChange={(e) => onChange(e.target.value)}
           required
           autoFocus
         />

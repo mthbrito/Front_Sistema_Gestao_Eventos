@@ -6,7 +6,7 @@ import NotificacoesTabela from "../components/admin/notificacoes/NotificacoesTab
 import Perfis from "../components/admin/perfis/Perfis";
 import SalasTabela from "../components/admin/salas/SalasTabela";
 import UsuariosTabela from "../components/admin/usuarios/UsuariosTabela";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/layout/Navbar";
 import { useDashboardAdmin } from "../hooks/admin/useDashboardAdmin";
 import { useAuth } from "../hooks/auth/useAuth";
 import "../styles/dashboard.css";
@@ -20,7 +20,7 @@ const ABAS = [
   { id: "perfis", icone: "bi-shield-check", label: "Perfis" },
 ];
 
-export default function AdminDashboard() {
+export default function AdminDashboardPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [abaAtiva, setAbaAtiva] = useState("eventos");

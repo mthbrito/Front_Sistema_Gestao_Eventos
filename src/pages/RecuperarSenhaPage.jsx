@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { authService } from "../services/authService";
 import "../styles/recuperarSenha.css";
 
-export default function RecuperarSenha() {
+export default function RecuperarSenhaPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 

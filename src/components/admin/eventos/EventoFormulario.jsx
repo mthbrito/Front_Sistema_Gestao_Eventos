@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { paraInputDatetimeLocal } from "../../../utils/formatacoes";
-import { eventoSchema } from "../../../utils/schemas";
+import { eventoSchema } from "../../../utils/admin/eventoSchema";
 
 const TIPOS_EVENTO = ["CURSO", "PALESTRA", "WORKSHOP"];
 

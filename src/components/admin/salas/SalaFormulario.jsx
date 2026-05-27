@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { salaSchema } from "../../../utils/schemas";
+import { salaSchema } from "../../../utils/admin/salaSchema";
 
 const criarEstadoInicial = (sala = {}) => ({
   nome: sala.nome ?? "",

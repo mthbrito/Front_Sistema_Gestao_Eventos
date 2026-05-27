@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/layout/Navbar";
 import EventosAba from "../components/usuario/eventos/EventosAba";
 import InscricoesAba from "../components/usuario/inscricoes/InscricoesAba";
 import NotificacoesAba from "../components/usuario/notificacoes/NotificacoesAba";
-import PerfilAba from "../components/usuario/perfil/PerfilAba";
+import MeuPerfilAba from "../components/usuario/meuPerfil/MeuPerfilAba";
 import { useAuth } from "../hooks/auth/useAuth";
 import { useDashboardUsuario } from "../hooks/usuario/useDashboardUsuario";
-import "../styles/dashboard.css";
+import "../styles/Dashboard.css";
 
-export default function UsuarioDashboard() {
+export default function UsuarioDashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [abaAtiva, setAbaAtiva] = useState("eventos");
@@ -20,20 +20,18 @@ export default function UsuarioDashboard() {
     notificacoes,
     recarregarTudo,
     totalNotificacoes,
-    editarUsuario,
-    salvandoEdicao,
   } = useDashboardUsuario(user.id);
 
   const ABAS = [
-    { id: "eventos",      icone: "bi-calendar-event", label: "Eventos"           },
-    { id: "inscricoes",   icone: "bi-bookmark-check", label: "Minhas Inscrições" },
-    { id: "notificacoes", icone: "bi-bell",            label: "Notificações", badge: totalNotificacoes },
-    { id: "perfil",       icone: "bi-person-circle",   label: "Meu Perfil"        },
+    { id: "eventos", icone: "bi-calendar-event", label: "Eventos" },
+    { id: "inscricoes", icone: "bi-bookmark-check", label: "Minhas Inscrições" },
+    { id: "notificacoes", icone: "bi-bell", label: "Notificações", badge: totalNotificacoes },
+    { id: "perfil", icone: "bi-person-circle", label: "Meu Perfil" },
   ];
 
   return (
     <div className="sge-dash-bg min-vh-100">
-      <Navbar onSair={() => { logout(); navigate("/login"); }} />
+      <Navbar user={user} onSair={() => { logout(); navigate("/login"); }} />
 
       <div className="container py-4">
         <div className="d-flex gap-2 mb-4 flex-wrap">
@@ -72,11 +70,7 @@ export default function UsuarioDashboard() {
           <NotificacoesAba dados={notificacoes} onAtualizar={recarregarTudo} />
         )}
         {abaAtiva === "perfil" && (
-          <PerfilAba
-            user={user}
-            onSalvar={editarUsuario}
-            salvando={salvandoEdicao}
-          />
+          <MeuPerfilAba />
         )}
       </div>
     </div>

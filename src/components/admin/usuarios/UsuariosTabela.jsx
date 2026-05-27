@@ -1,7 +1,7 @@
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
-import SpinnerCentral from "../../SpinnerCentral";
-import TabelaVazia from "../../TabelaVazia";
+import SpinnerCentral from "../../shared/SpinnerCentral";
+import TabelaVazia from "../../shared/TabelaVazia";
 import BaseModal from "../BaseModal";
 import ConfirmacaoModal from "../ConfirmacaoModal";
 import UsuarioFormulario from "./UsuarioFormulario";
@@ -29,9 +29,9 @@ export default function UsuariosTabela({ dados }) {
           <i className="bi bi-people me-2 text-primary" aria-hidden="true" />
           Gerenciar usuários
         </h6>
-        <span className="badge bg-primary bg-opacity-10 text-primary">
+        {/* <span className="badge bg-primary bg-opacity-10 text-primary">
           {lista.length} usuário(s)
-        </span>
+        </span> */}
       </div>
 
       {carregando ? (
@@ -109,6 +109,11 @@ export default function UsuariosTabela({ dados }) {
               ))}
             </tbody>
           </table>
+          <div className="d-flex justify-content-end me-2">
+            <span className="badge bg-primary bg-opacity-10 text-primary">
+              {lista.length} usuário(s)
+            </span>
+          </div>
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { inscricaoSchema } from "../../../utils/schemas";
+import { inscricaoSchema } from "../../../utils/admin/inscricaoSchema";
 
 const criarEstadoInicial = () => ({
   usuarioId: "",

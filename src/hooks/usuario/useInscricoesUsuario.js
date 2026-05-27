@@ -22,9 +22,11 @@ export const useInscricoesUsuario = (usuarioId) => {
       invalidar();
     },
     onError: (error) => {
-      const data = error.response?.data;
-      const mensagem = typeof data === "string" ? data : data?.message || error.message || "Ocorreu um erro.";
-      toast.error(mensagem);
+      if (error.response?.status === 400) {
+        const data = error.response.data;
+        const mensagem = typeof data === "string" ? data : data?.message || "Erro de validação.";
+        toast.error(mensagem);
+      }
     },
   });
 
@@ -36,9 +38,11 @@ export const useInscricoesUsuario = (usuarioId) => {
         invalidar();
       },
       onError: (error) => {
-        const data = error.response?.data;
-        const mensagem = typeof data === "string" ? data : data?.message || error.message || "Ocorreu um erro.";
-        toast.error(mensagem);
+        if (error.response?.status === 400) {
+          const data = error.response.data;
+          const mensagem = typeof data === "string" ? data : data?.message || "Erro de validação.";
+          toast.error(mensagem);
+        }
       },
     });
 

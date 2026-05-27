@@ -22,10 +22,11 @@ export const useNotificacoesUsuario = (usuarioId) => {
       invalidar();
     },
     onError: (error) => {
-      const msg = typeof error.response?.data === "string"
-        ? error.response.data
-        : error.response?.data?.message || error.message || "Ocorreu um erro.";
-      toast.error(msg);
+      if (error.response?.status === 400) {
+        const data = error.response.data;
+        const mensagem = typeof data === "string" ? data : data?.message || "Erro de validação.";
+        toast.error(mensagem);
+      }
     },
   });
 
@@ -38,7 +39,7 @@ export const useNotificacoesUsuario = (usuarioId) => {
       toast.success("Todas as notificações foram removidas!");
       invalidar();
     } catch {
-      toast.error("Erro ao remover notificações.");
+      toast.error("Erro ao remover as notificações.");
     }
   };
 

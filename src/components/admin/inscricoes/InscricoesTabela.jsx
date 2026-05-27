@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
 import { formatarData } from "../../../utils/formatacoes";
-import SpinnerCentral from "../../SpinnerCentral";
-import TabelaVazia from "../../TabelaVazia";
+import SpinnerCentral from "../../shared/SpinnerCentral";
+import TabelaVazia from "../../shared/TabelaVazia";
 import BaseModal from "../BaseModal";
 import ConfirmacaoModal from "../ConfirmacaoModal";
 import InscricaoFormulario from "./InscricaoFormulario";
@@ -67,14 +67,7 @@ export default function InscricoesTabela({ dados, eventos = [], usuarios = [] })
   const handleAlternarPresenca = (inscricao) => {
     marcarPresenca(inscricao.id, !inscricao.presente);
   };
-
-  const totalExibido = lista.length;
-  const totalGeral = listaTotal?.length ?? totalExibido;
-  const contadorTitulo =
-    totalExibido === totalGeral
-      ? `Gerenciar inscrições (${totalExibido})`
-      : `Gerenciar inscrições (${totalExibido} de ${totalGeral})`;
-
+  
   const tituloModal =
     tipoAcao === "confirmar" ? "Confirmar inscrição" : "Excluir inscrição";
   const textoBotaoModal = tipoAcao === "confirmar" ? "Confirmar" : "Excluir";
@@ -88,7 +81,7 @@ export default function InscricoesTabela({ dados, eventos = [], usuarios = [] })
             className="bi bi-bookmark-check me-2 text-primary"
             aria-hidden="true"
           />
-          {contadorTitulo}
+          Gerenciar inscrições
         </h6>
         <div className="d-flex gap-2 flex-wrap align-items-center">
           <select
@@ -220,6 +213,11 @@ export default function InscricoesTabela({ dados, eventos = [], usuarios = [] })
               ))}
             </tbody>
           </table>
+          <div className="d-flex justify-content-end me-2">
+            <span className="badge bg-primary bg-opacity-10 text-primary">
+              {lista.length} inscrição(ões)
+            </span>
+          </div>
         </div>
       )}
 

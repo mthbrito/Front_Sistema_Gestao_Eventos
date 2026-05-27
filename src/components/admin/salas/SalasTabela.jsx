@@ -1,7 +1,7 @@
 import { useConfirmacao } from "../../../hooks/ui/useConfirmacao";
 import { useModalEdicao } from "../../../hooks/ui/useModalEdicao";
-import SpinnerCentral from "../../SpinnerCentral";
-import TabelaVazia from "../../TabelaVazia";
+import SpinnerCentral from "../../shared/SpinnerCentral";
+import TabelaVazia from "../../shared/TabelaVazia";
 import BaseModal from "../BaseModal";
 import ConfirmacaoModal from "../ConfirmacaoModal";
 import SalaFormulario from "./SalaFormulario";
@@ -100,6 +100,11 @@ export default function SalasTabela({ dados }) {
               </div>
             </div>
           ))}
+          <div className="d-flex justify-content-end me-2">
+            <span className="badge bg-primary bg-opacity-10 text-primary">
+              {lista.length} sala(s)
+            </span>
+          </div>
         </div>
       )}
 

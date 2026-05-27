@@ -1,16 +1,8 @@
-export default function SenhaConfirmacaoInput({
-  value,
-  onChange,
-  mostrarSenha,
-  toggleSenha,
-}) {
+export default function SenhaConfirmacaoInput({ value, onChange, mostrarSenha, toggleSenha, label="Confirmar senha", disabled }) {
   return (
     <div className="mb-4">
-      <label
-        htmlFor="confirmarSenha"
-        className="form-label fw-semibold small text-body-emphasis"
-      >
-        Confirmar senha
+      <label htmlFor="confirmarSenha" className="form-label fw-semibold small text-body-emphasis">
+        {label}
       </label>
       <div className="input-group">
         <span className="input-group-text sge-input-addon">
@@ -23,16 +15,11 @@ export default function SenhaConfirmacaoInput({
           name="confirmarSenha"
           placeholder="••••••••"
           value={value}
-          onChange={onChange}
-          required
+          onChange={(e) => onChange(e.target.value)}
           autoComplete="new-password"
+          disabled={disabled}
         />
-        <button
-          type="button"
-          className="btn sge-toggle-pw input-group-text"
-          onClick={toggleSenha}
-          tabIndex={-1}
-        >
+        <button type="button" className="btn sge-toggle-pw input-group-text" onClick={toggleSenha} tabIndex={-1}>
           <i className={`bi ${mostrarSenha ? "bi-eye-slash" : "bi-eye"}`} />
         </button>
       </div>

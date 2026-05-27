@@ -4,22 +4,22 @@ export default function SenhaInput({
   mostrarSenha,
   toggleSenha,
   onEsqueceuSenha,
+  label = "Senha",
+  autoComplete = "current-password",
+  disabled = false,
 }) {
   return (
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-1">
         <label htmlFor="senha" className="form-label fw-semibold small text-body-emphasis mb-0">
-          Senha
+          {label}
         </label>
-        <button
-          type="button"
-          className="btn btn-link sge-link small text-decoration-none p-0"
-          onClick={onEsqueceuSenha}
-        >
-          Esqueceu a senha?
-        </button>
+        {onEsqueceuSenha && (
+          <button type="button" className="btn btn-link sge-link small text-decoration-none p-0" onClick={onEsqueceuSenha}>
+            Esqueceu a senha?
+          </button>
+        )}
       </div>
-
       <div className="input-group">
         <span className="input-group-text sge-input-addon">
           <i className="bi bi-lock" />
@@ -31,7 +31,8 @@ export default function SenhaInput({
           placeholder="••••••••"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          autoComplete="current-password"
+          autoComplete={autoComplete}
+          disabled={disabled}
         />
         <button
           type="button"

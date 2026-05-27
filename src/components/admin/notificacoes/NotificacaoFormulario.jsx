@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { notificacaoSchema } from "../../../utils/schemas";
+import { notificacaoSchema } from "../../../utils/admin/notificacaoSchema";
 
 const criarEstadoInicial = () => ({
   mensagem: "",

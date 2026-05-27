@@ -1,4 +1,4 @@
-import SpinnerCentral from "../../SpinnerCentral";
+import SpinnerCentral from "../../shared/SpinnerCentral";
 import InscricaoCard from "./InscricaoCard";
 
 export default function InscricoesAba({ dados, onAtualizar, onVerEventos }) {
