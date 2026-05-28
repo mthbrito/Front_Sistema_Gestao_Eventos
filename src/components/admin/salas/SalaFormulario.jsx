@@ -1,12 +1,6 @@
-import { useState } from "react";
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { salaSchema } from "../../../utils/admin/salaSchema";
-
-const criarEstadoInicial = (sala = {}) => ({
-  nome: sala.nome ?? "",
-  localizacao: sala.localizacao ?? "",
-  capacidade: sala.capacidade != null ? String(sala.capacidade) : "",
-});
 
 export default function SalaFormulario({
   valoresIniciais = {},
@@ -16,45 +10,33 @@ export default function SalaFormulario({
 }) {
   const modoEdicao = Boolean(valoresIniciais.id);
 
-  const [dados, setDados] = useState(() => criarEstadoInicial(valoresIniciais));
+  const { register,handleSubmit,formState: { errors } } = useForm({
+    resolver: zodResolver(salaSchema),
+    defaultValues: {
+      nome: valoresIniciais.nome ?? "",
+      localizacao: valoresIniciais.localizacao ?? "",
+      capacidade: valoresIniciais.capacidade ?? "",
+    },
+  });
 
-  const atualizarCampo = (campo) => (evento) => {
-    setDados((atual) => ({ ...atual, [campo]: evento.target.value }));
-  };
-
-  const handleSubmit = (evento) => {
-    evento.preventDefault();
-
-    const payload = {
-      nome: dados.nome.trim(),
-      localizacao: dados.localizacao.trim(),
-      capacidade: dados.capacidade ? Number(dados.capacidade) : null,
-    };
-
-    const resultado = salaSchema.safeParse(payload);
-
-    if (!resultado.success) {
-      resultado.error.issues.forEach((issue) => toast.error(issue.message));
-      return;
-    }
-
-    onSalvar(resultado.data);
-  };
+  const onSubmit = (data) => onSalvar(data);
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="row g-3" noValidate>
       <div className="col-12">
         <label htmlFor="sala-nome" className="form-label fw-semibold small">
           Nome *
         </label>
         <input
           id="sala-nome"
-          className="form-control sge-input"
-          value={dados.nome}
-          onChange={atualizarCampo("nome")}
+          className={`form-control sge-input${errors.nome ? " is-invalid" : ""}`}
           disabled={salvando}
           placeholder="Ex: Auditório Principal"
+          {...register("nome")}
         />
+        {errors.nome && (
+          <div className="invalid-feedback">{errors.nome.message}</div>
+        )}
       </div>
 
       <div className="col-md-8">
@@ -63,12 +45,14 @@ export default function SalaFormulario({
         </label>
         <input
           id="sala-localizacao"
-          className="form-control sge-input"
-          value={dados.localizacao}
-          onChange={atualizarCampo("localizacao")}
+          className={`form-control sge-input${errors.localizacao ? " is-invalid" : ""}`}
           disabled={salvando}
           placeholder="Ex: Bloco A, 2º andar"
+          {...register("localizacao")}
         />
+        {errors.localizacao && (
+          <div className="invalid-feedback">{errors.localizacao.message}</div>
+        )}
       </div>
 
       <div className="col-md-4">
@@ -79,12 +63,14 @@ export default function SalaFormulario({
           id="sala-capacidade"
           type="number"
           min={1}
-          className="form-control sge-input"
-          value={dados.capacidade}
-          onChange={atualizarCampo("capacidade")}
+          className={`form-control sge-input${errors.capacidade ? " is-invalid" : ""}`}
           disabled={salvando}
           placeholder="100"
+          {...register("capacidade", { valueAsNumber: true })}
         />
+        {errors.capacidade && (
+          <div className="invalid-feedback">{errors.capacidade.message}</div>
+        )}
       </div>
 
       <div className="col-12 d-flex gap-2 justify-content-end pt-2">
@@ -102,11 +88,7 @@ export default function SalaFormulario({
           disabled={salvando}
         >
           {salvando ? (
-            <span
-              className="spinner-border spinner-border-sm me-1"
-              role="status"
-              aria-hidden="true"
-            />
+            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
           ) : (
             <i className="bi bi-check-lg me-1" aria-hidden="true" />
           )}

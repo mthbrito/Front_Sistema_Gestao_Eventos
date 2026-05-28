@@ -1,11 +1,6 @@
-import { useState } from "react";
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { inscricaoSchema } from "../../../utils/admin/inscricaoSchema";
-
-const criarEstadoInicial = () => ({
-  usuarioId: "",
-  eventoId: "",
-});
 
 export default function InscricaoFormulario({
   usuarios = [],
@@ -14,42 +9,26 @@ export default function InscricaoFormulario({
   onCancelar,
   salvando = false,
 }) {
-  const [dados, setDados] = useState(() => criarEstadoInicial());
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(inscricaoSchema),
+    defaultValues: { usuarioId: "", eventoId: "" },
+  });
 
-  const atualizarCampo = (campo) => (e) => {
-    setDados((atual) => ({ ...atual, [campo]: e.target.value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const payload = {
-      usuarioId: dados.usuarioId ? Number(dados.usuarioId) : null,
-      eventoId: dados.eventoId ? Number(dados.eventoId) : null,
-    };
-
-    const resultado = inscricaoSchema.safeParse(payload);
-
-    if (!resultado.success) {
-      resultado.error.issues.forEach((issue) => toast.error(issue.message));
-      return;
-    }
-
-    onSalvar(resultado.data);
-  };
+  const onSubmit = (data) => onSalvar(data);
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="row g-3" noValidate>
       <div className="col-12">
         <label htmlFor="inscricao-usuario" className="form-label fw-semibold small">
           Usuário *
         </label>
         <select
           id="inscricao-usuario"
-          className="form-select sge-input"
-          value={dados.usuarioId}
-          onChange={atualizarCampo("usuarioId")}
+          className={`form-select sge-input${errors.usuarioId ? " is-invalid" : ""}`}
           disabled={salvando}
+          {...register("usuarioId", {
+            setValueAs: (v) => (v === "" ? null : Number(v)),
+          })}
         >
           <option value="">Selecione um usuário...</option>
           {usuarios.map((u) => (
@@ -58,6 +37,9 @@ export default function InscricaoFormulario({
             </option>
           ))}
         </select>
+        {errors.usuarioId && (
+          <div className="invalid-feedback">{errors.usuarioId.message}</div>
+        )}
       </div>
 
       <div className="col-12">
@@ -66,10 +48,11 @@ export default function InscricaoFormulario({
         </label>
         <select
           id="inscricao-evento"
-          className="form-select sge-input"
-          value={dados.eventoId}
-          onChange={atualizarCampo("eventoId")}
+          className={`form-select sge-input${errors.eventoId ? " is-invalid" : ""}`}
           disabled={salvando}
+          {...register("eventoId", {
+            setValueAs: (v) => (v === "" ? null : Number(v)),
+          })}
         >
           <option value="">Selecione um evento...</option>
           {eventos.map((ev) => (
@@ -78,6 +61,9 @@ export default function InscricaoFormulario({
             </option>
           ))}
         </select>
+        {errors.eventoId && (
+          <div className="invalid-feedback">{errors.eventoId.message}</div>
+        )}
       </div>
 
       <div className="col-12 d-flex gap-2 justify-content-end pt-2">
@@ -95,11 +81,7 @@ export default function InscricaoFormulario({
           disabled={salvando}
         >
           {salvando ? (
-            <span
-              className="spinner-border spinner-border-sm me-1"
-              role="status"
-              aria-hidden="true"
-            />
+            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
           ) : (
             <i className="bi bi-check-lg me-1" aria-hidden="true" />
           )}

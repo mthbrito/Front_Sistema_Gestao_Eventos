@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "./useAuth";
+import { decodificarUsuario } from "../../utils/autenticacao";
 
 export function useLogin() {
   const { login } = useAuth();
@@ -12,7 +13,8 @@ export function useLogin() {
 
     onSuccess: (data) => {
       toast.success("Login realizado com sucesso!");
-      const role = data?.usuario?.role;
+      const decoded = decodificarUsuario(data.token);
+      const role = decoded?.role;
       navigate(role === "ADMIN" ? "/admin/dashboard" : "/dashboard", { replace: true });
     },
 

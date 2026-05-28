@@ -1,19 +1,10 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { paraInputDatetimeLocal } from "../../../utils/formatacoes";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
 import { eventoSchema } from "../../../utils/admin/eventoSchema";
+import { paraInputDatetimeLocal } from "../../../utils/formatacoes";
 
 const TIPOS_EVENTO = ["CURSO", "PALESTRA", "WORKSHOP"];
-
-const criarEstadoInicial = (evento = {}) => ({
-  titulo: evento.titulo ?? "",
-  descricao: evento.descricao ?? "",
-  tipoEvento: evento.tipoEvento ?? "",
-  dataInicio: paraInputDatetimeLocal(evento.dataInicio),
-  dataTermino: paraInputDatetimeLocal(evento.dataTermino),
-  salaId: String(evento.salaId ?? evento.sala?.id ?? ""),
-  organizadorId: String(evento.organizadorId ?? evento.organizador?.id ?? ""),
-});
 
 export default function EventoFormulario({
   valoresIniciais = {},
@@ -26,52 +17,44 @@ export default function EventoFormulario({
   const dataMinima = new Date().toISOString().slice(0, 16);
   const modoEdicao = Boolean(valoresIniciais.id);
 
-  const [dados, setDados] = useState(() => criarEstadoInicial(valoresIniciais));
+  const schema = useMemo(() => eventoSchema(modoEdicao), [modoEdicao]);
 
-  const atualizarCampo = (campo) => (evento) => {
-    setDados((atual) => ({ ...atual, [campo]: evento.target.value }));
-  };
+  const { register, handleSubmit, watch, formState: { errors } } = useForm(
+    {
+      resolver: zodResolver(schema),
+      defaultValues: {
+        titulo: valoresIniciais.titulo ?? "",
+        descricao: valoresIniciais.descricao ?? "",
+        tipoEvento: valoresIniciais.tipoEvento ?? "",
+        dataInicio: paraInputDatetimeLocal(valoresIniciais.dataInicio),
+        dataTermino: paraInputDatetimeLocal(valoresIniciais.dataTermino),
+        salaId: String(valoresIniciais.salaId ?? valoresIniciais.sala?.id ?? ""),
+        organizadorId: String(
+          valoresIniciais.organizadorId ?? valoresIniciais.organizador?.id ?? ""
+        ),
+      },
+    });
 
-  const handleSubmit = (evento) => {
-    evento.preventDefault();
+  const dataInicio = watch("dataInicio");
 
-    const payload = {
-      titulo: dados.titulo.trim(),
-      descricao: dados.descricao.trim(),
-      tipoEvento: dados.tipoEvento,
-      dataInicio: dados.dataInicio,
-      dataTermino: dados.dataTermino,
-      salaId: dados.salaId ? Number(dados.salaId) : null,
-      organizadorId: dados.organizadorId ? Number(dados.organizadorId) : null,
-    };
-
-    const resultado = eventoSchema.safeParse(payload);
-
-    if (!resultado.success) {
-      const mensagens = resultado.error.issues.map((e) => e.message);
-      mensagens.forEach((msg) => toast.error(msg));
-      return;
-    }
-
-    onSalvar(resultado.data);
-  };
-
+  const onSubmit = (data) => onSalvar(data);
 
   return (
-    <form onSubmit={handleSubmit} className="row g-3" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="row g-3" noValidate>
       <div className="col-12">
         <label htmlFor="evento-titulo" className="form-label fw-semibold small">
           Título *
         </label>
         <input
           id="evento-titulo"
-          className="form-control sge-input"
-          value={dados.titulo}
-          onChange={atualizarCampo("titulo")}
-          required
+          className={`form-control sge-input${errors.titulo ? " is-invalid" : ""}`}
           disabled={salvando}
           placeholder="Nome do evento"
+          {...register("titulo")}
         />
+        {errors.titulo && (
+          <div className="invalid-feedback">{errors.titulo.message}</div>
+        )}
       </div>
 
       <div className="col-12">
@@ -80,13 +63,15 @@ export default function EventoFormulario({
         </label>
         <textarea
           id="evento-descricao"
-          className="form-control sge-input"
+          className={`form-control sge-input${errors.descricao ? " is-invalid" : ""}`}
           rows={3}
-          value={dados.descricao}
-          onChange={atualizarCampo("descricao")}
           disabled={salvando}
           placeholder="Descrição do evento"
+          {...register("descricao")}
         />
+        {errors.descricao && (
+          <div className="invalid-feedback">{errors.descricao.message}</div>
+        )}
       </div>
 
       <div className="col-md-4">
@@ -95,11 +80,9 @@ export default function EventoFormulario({
         </label>
         <select
           id="evento-tipo"
-          className="form-select sge-input"
-          value={dados.tipoEvento}
-          onChange={atualizarCampo("tipoEvento")}
-          required
+          className={`form-select sge-input${errors.tipoEvento ? " is-invalid" : ""}`}
           disabled={salvando}
+          {...register("tipoEvento")}
         >
           <option value="">Selecione...</option>
           {TIPOS_EVENTO.map((tipo) => (
@@ -108,6 +91,9 @@ export default function EventoFormulario({
             </option>
           ))}
         </select>
+        {errors.tipoEvento && (
+          <div className="invalid-feedback">{errors.tipoEvento.message}</div>
+        )}
       </div>
 
       <div className="col-md-4">
@@ -117,13 +103,14 @@ export default function EventoFormulario({
         <input
           id="evento-inicio"
           type="datetime-local"
-          className="form-control sge-input"
-          value={dados.dataInicio}
-          onChange={atualizarCampo("dataInicio")}
-          required
+          className={`form-control sge-input${errors.dataInicio ? " is-invalid" : ""}`}
           disabled={salvando}
           min={modoEdicao ? undefined : dataMinima}
+          {...register("dataInicio")}
         />
+        {errors.dataInicio && (
+          <div className="invalid-feedback">{errors.dataInicio.message}</div>
+        )}
       </div>
 
       <div className="col-md-4">
@@ -133,13 +120,14 @@ export default function EventoFormulario({
         <input
           id="evento-termino"
           type="datetime-local"
-          className="form-control sge-input"
-          value={dados.dataTermino}
-          onChange={atualizarCampo("dataTermino")}
-          required
+          className={`form-control sge-input${errors.dataTermino ? " is-invalid" : ""}`}
           disabled={salvando}
-          min={dados.dataInicio || dataMinima}
+          min={dataInicio || dataMinima}
+          {...register("dataTermino")}
         />
+        {errors.dataTermino && (
+          <div className="invalid-feedback">{errors.dataTermino.message}</div>
+        )}
       </div>
 
       <div className="col-md-6">
@@ -148,10 +136,9 @@ export default function EventoFormulario({
         </label>
         <select
           id="evento-sala"
-          className="form-select sge-input"
-          value={dados.salaId}
-          onChange={atualizarCampo("salaId")}
+          className={`form-select sge-input${errors.salaId ? " is-invalid" : ""}`}
           disabled={salvando}
+          {...register("salaId")}
         >
           <option value="">Sem sala definida</option>
           {salas.map((sala) => (
@@ -160,21 +147,20 @@ export default function EventoFormulario({
             </option>
           ))}
         </select>
+        {errors.salaId && (
+          <div className="invalid-feedback">{errors.salaId.message}</div>
+        )}
       </div>
 
       <div className="col-md-6">
-        <label
-          htmlFor="evento-organizador"
-          className="form-label fw-semibold small"
-        >
+        <label htmlFor="evento-organizador" className="form-label fw-semibold small">
           Organizador
         </label>
         <select
           id="evento-organizador"
-          className="form-select sge-input"
-          value={dados.organizadorId}
-          onChange={atualizarCampo("organizadorId")}
+          className={`form-select sge-input${errors.organizadorId ? " is-invalid" : ""}`}
           disabled={salvando}
+          {...register("organizadorId")}
         >
           <option value="">Selecione...</option>
           {organizadores.map((usuario) => (
@@ -183,6 +169,9 @@ export default function EventoFormulario({
             </option>
           ))}
         </select>
+        {errors.organizadorId && (
+          <div className="invalid-feedback">{errors.organizadorId.message}</div>
+        )}
       </div>
 
       <div className="col-12 d-flex gap-2 justify-content-end pt-2">
@@ -200,11 +189,7 @@ export default function EventoFormulario({
           disabled={salvando}
         >
           {salvando ? (
-            <span
-              className="spinner-border spinner-border-sm me-1"
-              role="status"
-              aria-hidden="true"
-            />
+            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
           ) : (
             <i className="bi bi-check-lg me-1" aria-hidden="true" />
           )}

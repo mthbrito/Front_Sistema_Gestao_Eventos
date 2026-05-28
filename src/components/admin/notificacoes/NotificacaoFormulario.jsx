@@ -1,17 +1,6 @@
-import { useState } from "react";
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { notificacaoSchema } from "../../../utils/admin/notificacaoSchema";
-
-const criarEstadoInicial = () => ({
-  mensagem: "",
-  enviarParaTodos: true,
-  usuarioId: "",
-});
-
-const montarPayload = (dados) => ({
-  mensagem: dados.mensagem.trim(),
-  destinatario: dados.enviarParaTodos ? "TODOS" : dados.usuarioId,
-});
 
 export default function NotificacaoFormulario({
   usuarios = [],
@@ -19,88 +8,53 @@ export default function NotificacaoFormulario({
   onCancelar,
   salvando = false,
 }) {
-  const [dados, setDados] = useState(() => criarEstadoInicial());
-
-  const atualizarCampo = (campo) => (evento) => {
-    setDados((atual) => ({ ...atual, [campo]: evento.target.value }));
-  };
-
-  const selecionarTodosUsuarios = () => {
-    setDados((atual) => ({ ...atual, enviarParaTodos: true, usuarioId: "" }));
-  };
-
-  const selecionarUsuarioEspecifico = () => {
-    setDados((atual) => ({ ...atual, enviarParaTodos: false }));
-  };
-
-  const montarPayload = (dados) => ({
-    mensagem: dados.mensagem.trim(),
-    usuarioId: dados.enviarParaTodos ? null : (dados.usuarioId ? Number(dados.usuarioId) : null),
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(notificacaoSchema),
+    defaultValues: { mensagem: "", destinatario: "todos", usuarioId: "" },
   });
 
-  const handleSubmit = (evento) => {
-    evento.preventDefault();
+  const destinatario = watch("destinatario");
+  const exigeUsuario = destinatario === "especifico";
 
-    if (exigeUsuario && !dados.usuarioId) {
-      toast.error("Selecione um usuário.");
-      return;
-    }
-
-    const payload = montarPayload(dados);
-
-    const resultado = notificacaoSchema.safeParse(payload);
-
-    if (!resultado.success) {
-      resultado.error.issues.forEach((issue) => toast.error(issue.message));
-      return;
-    }
-
-    onEnviar(resultado.data);
+  const onSubmit = (data) => {
+    onEnviar({
+      mensagem: data.mensagem,
+      usuarioId: exigeUsuario && data.usuarioId ? Number(data.usuarioId) : null,
+    });
   };
 
-  const exigeUsuario = !dados.enviarParaTodos;
-
   return (
-    <form onSubmit={handleSubmit} className="row g-3" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="row g-3" noValidate>
       <div className="col-12">
-        <label
-          htmlFor="notificacao-mensagem"
-          className="form-label fw-semibold small"
-        >
+        <label htmlFor="notificacao-mensagem" className="form-label fw-semibold small">
           Mensagem *
         </label>
         <textarea
           id="notificacao-mensagem"
-          className="form-control sge-input"
+          className={`form-control sge-input${errors.mensagem ? " is-invalid" : ""}`}
           rows={4}
-          value={dados.mensagem}
-          onChange={atualizarCampo("mensagem")}
           disabled={salvando}
           placeholder="Digite a mensagem da notificação..."
+          {...register("mensagem")}
         />
+        {errors.mensagem && (
+          <div className="invalid-feedback">{errors.mensagem.message}</div>
+        )}
       </div>
 
       <div className="col-12">
         <span className="form-label fw-semibold small d-block">Destinatário</span>
-        <div
-          className="d-flex gap-3 mb-2"
-          role="radiogroup"
-          aria-label="Tipo de destinatário"
-        >
+        <div className="d-flex gap-3 mb-2" role="radiogroup" aria-label="Tipo de destinatário">
           <div className="form-check">
             <input
               className="form-check-input"
               type="radio"
               id="notificacao-dest-todos"
-              name="notificacao-destinatario"
-              checked={dados.enviarParaTodos}
-              onChange={selecionarTodosUsuarios}
+              value="todos"
               disabled={salvando}
+              {...register("destinatario")}
             />
-            <label
-              className="form-check-label small"
-              htmlFor="notificacao-dest-todos"
-            >
+            <label className="form-check-label small" htmlFor="notificacao-dest-todos">
               <i className="bi bi-people me-1" aria-hidden="true" />
               Todos os usuários
             </label>
@@ -110,15 +64,11 @@ export default function NotificacaoFormulario({
               className="form-check-input"
               type="radio"
               id="notificacao-dest-usuario"
-              name="notificacao-destinatario"
-              checked={exigeUsuario}
-              onChange={selecionarUsuarioEspecifico}
+              value="especifico"
               disabled={salvando}
+              {...register("destinatario")}
             />
-            <label
-              className="form-check-label small"
-              htmlFor="notificacao-dest-usuario"
-            >
+            <label className="form-check-label small" htmlFor="notificacao-dest-usuario">
               <i className="bi bi-person me-1" aria-hidden="true" />
               Usuário específico
             </label>
@@ -135,10 +85,9 @@ export default function NotificacaoFormulario({
             </label>
             <select
               id="notificacao-usuario"
-              className="form-select sge-input"
-              value={dados.usuarioId}
-              onChange={atualizarCampo("usuarioId")}
+              className={`form-select sge-input${errors.usuarioId ? " is-invalid" : ""}`}
               disabled={salvando}
+              {...register("usuarioId")}
             >
               <option value="">Selecione o usuário...</option>
               {usuarios.map((usuario) => (
@@ -147,6 +96,9 @@ export default function NotificacaoFormulario({
                 </option>
               ))}
             </select>
+            {errors.usuarioId && (
+              <div className="invalid-feedback">{errors.usuarioId.message}</div>
+            )}
           </>
         )}
       </div>
@@ -166,11 +118,7 @@ export default function NotificacaoFormulario({
           disabled={salvando}
         >
           {salvando ? (
-            <span
-              className="spinner-border spinner-border-sm me-1"
-              role="status"
-              aria-hidden="true"
-            />
+            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
           ) : (
             <i className="bi bi-send me-1" aria-hidden="true" />
           )}
